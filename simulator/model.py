@@ -82,7 +82,7 @@ def get_phishing_response(chat_history, scenario_name):
         # 4. 모델 선언 (Vertex AI 방식)
         # 모델 이름은 'gemini-2.0-flash-001' 또는 'gemini-1.5-flash-002' 등 Vertex AI 지원 이름을 사용하세요.
         model = GenerativeModel(
-            model_name="gemini-2.5-flash-lite", 
+            model_name="gemini-2.5-flash", 
             system_instruction=[full_system_instruction],
             safety_settings=safety_settings
         )
