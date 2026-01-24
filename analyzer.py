@@ -9,7 +9,7 @@ def analyze_phishing_chat(messages, scenario):
     
     # 1. 분석을 위한 기본 점수 설정
     score = 100
-    risk_keywords = ["계좌", "비밀번호", "인증번호", "송금", "카드번호", "이름"]
+    risk_keywords = ["계좌", "비밀번호", "인증번호", "송금", "카드번호", "이름", "은행", "주식","결제"]
     detected_risks = []
 
     # 2. 대화 내역 분석 (간단한 키워드 탐지 예시)
@@ -19,7 +19,7 @@ def analyze_phishing_chat(messages, scenario):
             content = msg['content']
             for keyword in risk_keywords:
                 if keyword in content:
-                    score -= 15  # 위험 키워드 노출 시 감점
+                    score -= 20  # 위험 키워드 노출 시 감점
                     if keyword not in detected_risks:
                         detected_risks.append(keyword)
 
@@ -27,10 +27,10 @@ def analyze_phishing_chat(messages, scenario):
     score = max(0, score)
 
     # 4. 분석 코멘트 생성 (점수대별)
-    if score >= 80:
-        comment = "피싱 시도에 매우 신착하게 대응하셨습니다. 개인정보를 안전하게 보호했습니다."
+    if score >= 90:
+        comment = "피싱 시도에 매우 침착하게 대응하셨습니다. 개인정보를 안전하게 보호했습니다."
         grade = "A (안전)"
-    elif score >= 50:
+    elif score >= 70:
         comment = "일부 민감한 정보가 노출될 뻔했으나 대체로 잘 방어하셨습니다."
         grade = "B (주의)"
     else:
