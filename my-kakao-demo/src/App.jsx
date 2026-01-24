@@ -225,7 +225,7 @@ const KakaoDemo = () => {
 
   const renderChat = () => (
     <div className="flex h-screen bg-gray-100 font-sans">
-      <div className="flex-1 flex flex-col max-w-lg mx-auto bg-[#b2c7d9] shadow-2xl relative">
+      <div className="flex-1 flex flex-col max-w-lg mx-auto bg-[#b2c7d9] shadow-2xl relative overflow-hidden">
         {/* 헤더 (기존 유지) */}
         <div className="bg-[#b2c7d9]/90 backdrop-blur-sm p-4 flex justify-between items-center sticky top-0 z-10">
           <div className="flex flex-col">
@@ -280,10 +280,9 @@ const KakaoDemo = () => {
         </div>
 
         {/* 하단 입력창 + 마이크 버튼 (애니메이션 추가) */}
-        <div className="bg-white p-3 space-y-2">
-          {/* 음성 인식 중일 때 나타나는 시각적 피드백 */}
+        <div className="bg-white p-3 space-y-2 border-t">
           {isListening && (
-            <div className="flex items-center justify-center py-2 bg-blue-50 rounded-xl animate-pulse">
+            <div className="flex items-center justify-center py-2 bg-blue-50 rounded-xl">
               <div className="flex space-x-1">
                 <div className="w-1.5 h-4 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
                 <div className="w-1.5 h-6 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -293,20 +292,20 @@ const KakaoDemo = () => {
             </div>
           )}
           
-          <form onSubmit={handleSendMessage} className="flex items-center relative">
-            {/* 음성 인식 마이크 버튼 */}
+          <form onSubmit={handleSendMessage} className="flex items-center">
             <button
               type="button"
               onClick={handleToggleListening}
-              className={`mr-2 p-2.5 rounded-xl transition-all duration-300 relative ${
+              className={`mr-2 p-2.5 rounded-xl transition-all duration-300 relative overflow-hidden flex-shrink-0 ${
                 isListening ? 'bg-blue-500 text-white shadow-lg' : 'bg-gray-100 text-gray-500'
               }`}
             >
-              {isListening && (
-                <span className="absolute inset-0 rounded-xl animate-ping bg-blue-400 opacity-75"></span>
-              )}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m8 0h-8m4-14a3 3 0 00-3 3v5a3 3 0 006 0V5a3 3 0 00-3-3z" />
+              {isListening && (<span className="absolute inset-0 rounded-xl animate-ping bg-blue-400 opacity-75"></span>)}
+              
+              {/* 바뀐 마이크 아이콘: 더 굵고 직관적임 */}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`h-6 w-6 relative z-10 transition-transform duration-300 ${isListening ? 'scale-110 drop-shadow-sm' : ''}`}>
+                <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
+                <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
               </svg>
             </button>
 
@@ -316,12 +315,10 @@ const KakaoDemo = () => {
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={isListening ? "말씀해 주세요..." : "메시지를 입력하세요"}
               disabled={isLoading}
-              className="flex-1 bg-gray-100 rounded-xl px-4 py-2.5 mr-2 text-sm outline-none focus:ring-1 focus:ring-yellow-400"
+              className="flex-1 bg-gray-100 rounded-xl px-4 py-2.5 mr-2 text-sm outline-none focus:ring-1 focus:ring-yellow-400 w-full"
             />
             <button type="submit" disabled={isLoading} className="bg-[#f7e600] p-2.5 rounded-xl flex-shrink-0">
-              <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-              </svg>
+              <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" /></svg>
             </button>
           </form>
         </div>
