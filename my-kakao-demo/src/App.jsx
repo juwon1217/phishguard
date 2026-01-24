@@ -120,7 +120,7 @@ const KakaoDemo = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/chat', {
+      const response = await fetch('http://192.168.0.2:8000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -149,7 +149,7 @@ const KakaoDemo = () => {
   const handleFinishChat = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:8000/analyze', {
+      const response = await fetch('http://192.168.0.2:8000/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
