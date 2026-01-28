@@ -4,7 +4,7 @@
 FAMILY_KEYWORDS = ["엄마", "아빠", "딸", "아들", "고장", "수리", "편의점"]
 AGENCY_KEYWORDS = ["검찰", "수사관", "서울지검", "금감원", "금융위원회", "계좌", "도용"]
 URGENCY_KEYWORDS = ["즉시", "마감", "당장", "긴급", "구속", "영장", "유포"]
-FINANCIAL_KEYWORDS = ["상품권", "핀번호", "송금", "이체", "대출", "승인", "선입금"]
+FINANCIAL_KEYWORDS = ["상품권", "핀번호", "송금", "이체", "대출", "승인", "선입금","전액",]
 URL_KEYWORDS = ["http", "https", ".com", ".kr", "bit.ly"]
 
 # TF-IDF Settings
