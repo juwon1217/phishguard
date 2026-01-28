@@ -27,8 +27,8 @@ XGB_PARAMS = {
 THRESHOLD = 0.5
 
 # Data paths
-TRAIN_DATA_PATH = "data/train.csv"
-TEST_DATA_PATH = "data/test.csv"
+TRAIN_DATA_PATH = "normal_data_from_zip_train.csv"
+TEST_DATA_PATH = "normal_data_from_zip_val.csv"
 MODEL_PATH = "models/phishing_xgb_model.joblib"
 
 # Feature names
@@ -51,3 +51,5 @@ XGB_PARAMS = {
     "random_state": 42,
     "eval_metric": "logloss"
 }
+
+CATEGORIES = '상거래 전반','가족','회사/아르바이트','주거와 생활','건강'
