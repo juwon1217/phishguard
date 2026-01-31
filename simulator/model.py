@@ -10,7 +10,7 @@ load_dotenv()
 # 2. Vertex AI 초기화 설정
 # .env에 GCP_PROJECT_ID와 GCP_REGION(예: asia-northeast3)이 설정되어 있어야 합니다.
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
-LOCATION = os.getenv("GCP_REGION", "asia-northeast3") 
+LOCATION = os.getenv("GCP_REGION", "us-central1") 
 
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
