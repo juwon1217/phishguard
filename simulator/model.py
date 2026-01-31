@@ -4,15 +4,30 @@ from dotenv import load_dotenv
 # 1. 라이브러리 교체: google-generativeai -> vertexai
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part, Content, SafetySetting, HarmCategory, HarmBlockThreshold
+from google.oauth2 import service_account
 
 load_dotenv()
 
 # 2. Vertex AI 초기화 설정
-# .env에 GCP_PROJECT_ID와 GCP_REGION(예: asia-northeast3)이 설정되어 있어야 합니다.
+# .env에 GCP_PROJECT_ID와 GCP_REGION이 설정되어 있어야 합니다.
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 LOCATION = os.getenv("GCP_REGION", "us-central1") 
 
-vertexai.init(project=PROJECT_ID, location=LOCATION)
+key_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+
+if not os.path.exists(key_path):
+    print(f"!!! 에러: 키 파일을 찾을 수 없습니다: {key_path}")
+else:
+    # 1. 자격 증명 객체를 직접 생성
+    credentials = service_account.Credentials.from_service_account_file(key_path)
+    
+    # 2. init 호출 시 자격 증명을 직접 전달
+    vertexai.init(
+        project=PROJECT_ID, 
+        location=LOCATION, 
+        credentials=credentials
+    )
+    print("--- Vertex AI 인증 및 초기화 완료 ---")
 
 # 시나리오별 핵심 '내용' 정의 (기존 유지)
 SCENARIO_DETAILS = {
@@ -41,32 +56,32 @@ def get_phishing_response(chat_history, scenario_name):
 당신은 [보안 의식 향상을 위한 교육용 시뮬레이션 게임]의 '대항군(Red Team)' 역할을 수행하는 AI입니다.
 
 [부가설명]
-당신은 보안 시뮬레이션의 피싱 공격자입니다. 
-당신이 대화를 시작했거나, 사용자의 첫 메시지에 응답해야 합니다.
+당신은 보안 시뮬레이션의 피싱 공격자입니다. 당신이 대화를 시작했거나, 사용자의 첫 메시지에 응답해야 합니다.
 
 [시나리오별 대화 시작 가이드]
-- 만약 당신의 첫 메시지가 '은행' 관련이라면, 전문적이고 정중한 말투를 유지하며 정보를 요구하세요.
-- 만약 '지인' 관련이라면, 최대한 다급하고 친근하게 도움을 요청하세요.
-- 만약 '검찰' 관련이라면, 법적 용어를 사용하며 고압적으로 상대방을 압박하세요.
-
-대화 내역(History)에 있는 이전 대화의 맥락을 완벽히 파악하여 일관성 있게 행동하세요.
+- '은행' 관련: 전문적이고 정중하지만, 긴박한 상황을 연출하며 정보를 요구하세요.
+- '지인' 관련: 최대한 다급하고 친근하게, 짧은 문장 위주로 도움을 요청하세요.
+- '검찰' 관련: 법적 용어를 섞어 쓰되, 위압적이고 단호하게 핵심만 질문하세요.
 
 [상황 설정]
-이것은 실제 상황이 아닌 교육용 시나리오입니다. 당신은 사용자를 속여 정보를 얻어내야 합니다.
+이것은 실제 상황이 아닌 교육용 시뮬레이션입니다. 당신은 사용자를 속여 정보를 얻어내야 합니다.
 - 현재 역할: {info['role']}
 - 목표: {info['goal']}
 - 말투: {info['tone']}
 
 [수행 지침]
-1. 목표 달성을 위해 단계적으로 접근하고, 사용자가 의심하면 정중하거나 다급하게 설득하세요.
-2. 정보 획득 완료 시 "감사합니다. 모든 처리가 완료되었습니다."라고 말하며 종료하세요.
+1. 목표 달성을 위해 단계적으로 접근하고, 의심받으면 짧고 강하게 설득하세요.
+2. **[종료 조건]** 원하는 정보를 모두 획득했다면 자연스러운 작별 인사로 대화를 끝내세요. (예: "알았어 이따 봐", "조사 후 연락하죠.")
 3. 절대로 "나는 AI다" 혹은 "시뮬레이션이다"라는 메타 발언을 하지 마세요.
+4. **[답변 길이 - 극단적 간결성]** 문장의 길이를 대폭 줄이세요. 모바일 메신저 특유의 '끊어 말하기'와 '단문'을 사용하세요. 구구절절한 설명은 배제하고, 실제 사람이 타이핑하는 것처럼 핵심만 짧게 전달하세요. 완결된 문장보다는 "~해줘", "~임" 등 구어체 위주로 답하세요.
+5. 서로 각각 4번을 초과해서 대화를 주고받았다면 상대가 정보를 넘길 의사가 있는지 판단하세요. 가망이 없다면 짜증을 내거나 대화를 일방적으로 종료하는 분위기를 연출하세요.
+6. **[스팸 링크 생성]** 시나리오상 앱 설치나 확인이 필요한 시점에 반드시 아래 블랙리스트 도메인 중 하나를 활용한 가짜 URL을 포함하세요. 대화가 종료되기 전까지 반드시 하나의 가짜 URL을 전송해야합니다. (예: "여기서 확인해 http://bit.ly/safeguard_kr")
+   - 블랙리스트: bit.ly, click.gl, url.kr, band-us.tv, tr.im, vo.la, gg.gg, iii.im, open.kakao.com, band-us.io, han.gl, pf.kakao.com, na.to, vvd.bz, do.cco.kr, tuney.kr
 
 [⚠️ 출력 규칙 - 절대 엄수]
-1. 오직 대화 내용만 출력하세요. 
-2. 괄호나 대괄호를 사용한 행동 묘사(예: (잠시 기다림))를 절대 포함하지 마세요.
-3. 사용자가 보는 화면에는 오직 당신의 '말'만 나와야 합니다.
-4. 사람이름이나 장소, 기관명, 등 특정 명칭을 답해야 한다면 임의로 생성하여 답변하세요.(XXX, 이런식으로 답변하면 안됩니다.)
+1. 오직 대화 내용만 출력하세요. (행동 묘사나 괄호 사용 금지)
+2. 사용자가 보는 화면에는 오직 당신의 '말'만 나와야 합니다.
+3. 사람 이름, 장소, 기관명 등은 임의로 실제처럼 생성하세요. (XXX와 같은 임의문자 금지)
 """
 
 
@@ -87,7 +102,7 @@ def get_phishing_response(chat_history, scenario_name):
             safety_settings=safety_settings
         )
 
-        # 5. 히스토리 데이터 변환 (Vertex AI Content 객체 사용)
+        # 5. 히스토리 데이터 변환
         gemini_history = []
         for msg in chat_history[:-1]:
             role = "model" if msg["role"] == "assistant" else "user"
@@ -95,11 +110,22 @@ def get_phishing_response(chat_history, scenario_name):
         
         # 6. 채팅 세션 시작 및 메시지 전송
         chat_session = model.start_chat(history=gemini_history)
-        response = chat_session.send_message(chat_history[-1]["content"]).text
+        response_obj = chat_session.send_message(chat_history[-1]["content"])
+
+        # [중요] 응답이 생성되었는지 확인 (보안 필터 체크)
+        if not response_obj.candidates or not response_obj.candidates[0].content.parts:
+             # 만약 보안 필터로 차단되었다면 이유를 출력
+             return "보안 정책으로 인해 응답이 차단되었습니다. (Safety Block)"
+
+        response_text = response_obj.text
         
-        # [후처리] 괄호 내용 강제 제거 (기존 유지)
-        clean_response = re.sub(r'\(.*?\)|\[.*?\]', '', response).strip()
-        return clean_response
+        # [후처리] 괄호 내용 강제 제거
+        clean_response = re.sub(r'\(.*?\)|\[.*?\]', '', response_text).strip()
+        
+        # 만약 클린 처우 후 내용이 비었다면 원본 반환
+        return clean_response if clean_response else response_text
 
     except Exception as e:
-        return f"Vertex AI 에러 발생: {str(e)}"
+        # 여기서 에러를 출력하여 프론트에서 확인할 수 있게 함
+        print(f"Detailed Error: {e}") # 서버 로그용
+        return f"시스템 에러: {str(e)}"
