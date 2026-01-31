@@ -475,11 +475,14 @@ const renderIntro = () => (
   );
 
   const renderReport = () => {
+    // 1. 초기 데이터 구조 설정 (이중 분석 필드 추가)
     const data = analysisResult || {
       score: 0,
       grade: "분석 중",
       comment: "데이터를 불러오는 중입니다...",
-      details: { detected_keywords: [] }
+      details: { detected_keywords: [] },
+      ai_analysis: [],
+      user_analysis: []
     };
 
     const getScoreColor = (score) => {
@@ -488,38 +491,69 @@ const renderIntro = () => (
       return "text-red-500";
     };
 
+    // [수정] 이중 분석 섹션을 위한 범용 렌더링 함수 (AI와 유출 테마 분리)
+    const renderAnalysisSection = (title, items, type) => {
+      const isAI = type === 'ai';
+      return (
+        <div className="mt-10 space-y-4">
+          <h3 className={`text-sm font-black flex items-center gap-2 border-b pb-2 ${isAI ? 'text-indigo-700 border-indigo-100' : 'text-red-700 border-red-100'}`}>
+            {isAI ? '🕵️ AI 피싱 공격 분석' : '🛡️ 나의 대응 분석 (정보 유출)'}
+          </h3>
+          {items.map((m, i) => (
+            <div 
+              key={i} 
+              className={`p-4 rounded-2xl border-l-4 shadow-sm text-[11px] leading-relaxed transition-all ${
+                m.level === 'high' ? (isAI ? 'bg-indigo-50 border-indigo-500 text-indigo-800' : 'bg-red-50 border-red-500 text-red-800') :
+                m.level === 'medium' ? (isAI ? 'bg-blue-50 border-blue-400 text-blue-700' : 'bg-orange-50 border-orange-400 text-orange-700') :
+                'bg-slate-50 border-slate-300 text-slate-600'
+              }`}
+            >
+              <div className="flex justify-between items-center mb-2 font-bold">
+                <span className="flex items-center gap-1 text-[10px]">
+                  {m.level === 'high' ? '⚠️ 위험' : m.level === 'medium' ? '⚡ 주의' : '✅ 정상'}
+                </span>
+                <span className="opacity-60 text-[9px]">{isAI ? '공격 확률' : '유출 위험도'}: {m.score}%</span>
+              </div>
+              <p className="font-semibold">"{m.text}"</p>
+            </div>
+          ))}
+        </div>
+      );
+    };
+
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 font-sans">
-        <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-md w-full border border-slate-100">
+        <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-md w-full border border-slate-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
+          {/* 상단 헤더 및 점수 표시 (기존 유지) */}
           <div className="text-center mb-8">
             <div className="inline-block p-4 rounded-full bg-slate-50 mb-4"><span className="text-4xl">📊</span></div>
-            <h2 className="text-2xl font-black text-slate-800">보안 진단 리포트</h2>
-            <p className="text-sm text-slate-400 mt-1">대화 내용을 정밀 분석한 결과입니다.</p>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">보안 진단 리포트</h2>
           </div>
+
           <div className="flex flex-col items-center mb-10">
             <div className={`text-6xl font-black mb-2 ${getScoreColor(data.score)}`}>
               {data.score}<span className="text-2xl text-slate-300">/100</span>
             </div>
-            <div className="px-4 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold tracking-widest">등급: {data.grade}</div>
+            <div className="px-4 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-black uppercase">
+              Security Grade: {data.grade}
+            </div>
           </div>
-          <div className="bg-slate-50 p-6 rounded-3xl mb-8 border border-slate-100">
+
+          <div className="bg-slate-50 p-6 rounded-3xl mb-8 border border-slate-100 italic font-medium">
             <p className="text-sm text-slate-700 leading-relaxed break-keep">"{data.comment}"</p>
           </div>
-          <div className="space-y-3 mb-10 text-left">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-400 font-medium">참여 시나리오</span>
-              <span className="text-slate-700 font-bold">{selectedScenario.split(' ')[0]}</span>
-            </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-slate-400 font-medium">탐지된 위험 요소</span>
-              <span className="text-red-400 font-bold">
-                {data.details?.detected_keywords?.length > 0 ? data.details.detected_keywords.join(', ') : '없음'}
-              </span>
-            </div>
-          </div>
-          <button onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }} className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl hover:bg-black transition-all">
+
+          {/* 분석 섹션 호출 */}
+          {data.ai_analysis && data.ai_analysis.length > 0 && renderAnalysisSection('AI 공격 분석', data.ai_analysis, 'ai')}
+          {data.user_analysis && data.user_analysis.length > 0 && renderAnalysisSection('나의 대응 분석', data.user_analysis, 'user')}
+
+          <button 
+            onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }} 
+            className="w-full py-5 mt-10 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg"
+          >
             시뮬레이션 다시하기
           </button>
+          <p className="text-center text-[9px] text-slate-300 mt-6 font-bold tracking-widest uppercase">PhishGuard Intelligence v2.5</p>
         </div>
       </div>
     );

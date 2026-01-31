@@ -1,10 +1,10 @@
-from config import (
+from scoring_system.config import (
     FAMILY_KEYWORDS, AGENCY_KEYWORDS, URGENCY_KEYWORDS,
     FINANCIAL_KEYWORDS, URL_KEYWORDS
 )
 
 def count_keywords(text, keywords):
-    return sum(text.count(k) for k in str(text))
+    return sum(text.lower().count(k.lower()) for k in keywords)
 
 def has_url_pattern(text):
     return 1 if any(k in str(text) for k in URL_KEYWORDS) else 0
