@@ -23,6 +23,7 @@ const SCENARIO_PROFILES = {
 
 const KakaoDemo = () => {
   // --- 공통 상태 관리 ---
+  const apiBaseUrl = import.meta.env.VITE_API_URL || "";
   const [view, setView] = useState('intro');
   const [selectedScenario, setSelectedScenario] = useState(Object.keys(SCENARIO_PROFILES)[0]);
   const [messages, setMessages] = useState([]);
