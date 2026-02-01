@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+fastapi
+uvicorn
+pydantic
+python-dotenv
+requests
+google-auth
+pandas
+scikit-learn
+xgboost
+openpyxl

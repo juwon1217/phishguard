@@ -1,0 +1,34 @@
+{
+    "devCommand": "npm run dev",
+    "builds": [
+        {
+            "src": "main.py",
+            "use": "@vercel/python"
+        },
+        {
+            "src": "my-kakao-demo/package.json",
+            "use": "@vercel/static-build",
+            "config": {
+                "distDir": "dist"
+            }
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/main.py"
+        },
+        {
+            "src": "/docs",
+            "dest": "/main.py"
+        },
+        {
+            "src": "/openapi.json",
+            "dest": "/main.py"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/my-kakao-demo/$1"
+        }
+    ]
+}

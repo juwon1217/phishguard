@@ -1,0 +1,17 @@
+.git
+__pycache__
+**/node_modules
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+venv
+ENV
+env.bak
+venv.bak
+scoring_system/xgb_model.joblib
+scoring_system/tfidf_vectorizer.joblib
+*.zip
+*.csv
+020.주제별 텍스트 일상 대화 데이터
