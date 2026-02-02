@@ -174,9 +174,10 @@ const KakaoDemo = () => {
   };
 
   const handleFinishChat = async () => {
-    // [Bug Fix] 대화 내용이 없을 때 리포트 화면으로 넘어가면 에러 발생 -> 예외 처리
-    if (messages.length === 0) {
-      alert("대화 내용이 없습니다. 시뮬레이션을 먼저 진행해주세요.");
+    // [Bug Fix] 사용자 메시지가 없을 때(AI 첫 인사만 있을 때) 리포트 화면으로 넘어가면 에러 발생
+    const hasUserMessage = messages.some(m => m.sender === 'me');
+    if (!hasUserMessage) {
+      alert("대화 내용이 부족합니다. 답변을 입력해 시뮬레이션을 진행해주세요.");
       setView('intro');
       return;
     }
