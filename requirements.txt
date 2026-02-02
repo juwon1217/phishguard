@@ -1,4 +1,15 @@
+# Force Rebuild: v4
 fastapi
+uvicorn
+requests
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+python-dotenv
+scikit-learn
+xgboost
+pandas
+scipy
 uvicorn
 pydantic
 python-dotenv
