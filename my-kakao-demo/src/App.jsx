@@ -23,10 +23,7 @@ const SCENARIO_PROFILES = {
 
 const KakaoDemo = () => {
   // --- 공통 상태 관리 ---
-<<<<<<< HEAD
   const apiBaseUrl = import.meta.env.VITE_API_URL || "";
-=======
->>>>>>> upstream/main
   const [view, setView] = useState('intro');
   const [selectedScenario, setSelectedScenario] = useState(Object.keys(SCENARIO_PROFILES)[0]);
   const [messages, setMessages] = useState([]);
@@ -142,13 +139,13 @@ const KakaoDemo = () => {
             role: m.role || (m.sender === 'me' ? 'user' : 'assistant'),
             content: m.text
 =======
-      const response = await fetch('http://localhost:8000/chat', { 
+      const response = await fetch('http://localhost:8000/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: newMessages.map(m => ({ 
-            role: m.role || (m.sender === 'me' ? 'user' : 'assistant'), 
-            content: m.text 
+          messages: newMessages.map(m => ({
+            role: m.role || (m.sender === 'me' ? 'user' : 'assistant'),
+            content: m.text
 >>>>>>> upstream/main
           })),
           scenario: selectedScenario
@@ -176,7 +173,7 @@ const KakaoDemo = () => {
       setIsLoading(false);
 =======
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
 >>>>>>> upstream/main
     }
   };
@@ -492,14 +489,14 @@ const renderIntro = () => (
             <div className="relative mb-6 group">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
               <div className="relative bg-white p-5 rounded-full shadow-sm border border-blue-50">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2.5" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   className="w-14 h-14 text-blue-600 animate-[pulse_3s_infinite]"
                 >
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -527,7 +524,7 @@ const renderIntro = () => (
                 훈련 시나리오 선택
               </label>
               <div className="relative">
-                <select 
+                <select
                   value={selectedScenario}
                   onChange={handleScenarioChange}
                   className="w-full p-4 pl-6 pr-12 border-2 border-slate-100 rounded-2xl bg-slate-50/50 text-gray-800 text-base font-bold outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
@@ -538,7 +535,7 @@ const renderIntro = () => (
                 </select>
               </div>
             </div>
-            <button 
+            <button
               onClick={handleStartSimulation}
               className="w-full py-5 bg-[#f7e600] text-gray-900 text-xl font-black rounded-2xl hover:bg-[#ffe812] hover:scale-[1.03] shadow-xl hover:shadow-2xl active:scale-95 transition-all duration-300 ring-offset-2 focus:ring-4 focus:ring-[#f7e600]/50"
             >
@@ -578,27 +575,26 @@ const renderIntro = () => (
                   <div className="flex items-end space-x-1">
                     {message.sender === 'me' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
 <<<<<<< HEAD
-                    <div className={`px-3 py-2 rounded-2xl max-w-[240px] text-sm shadow-sm ${message.sender === 'me' ? 'bg-[#ffe812] rounded-tr-none' : 'bg-white rounded-tl-none'
-                      }`}>
+  <div className={`px-3 py-2 rounded-2xl max-w-[240px] text-sm shadow-sm ${message.sender === 'me' ? 'bg-[#ffe812] rounded-tr-none' : 'bg-white rounded-tl-none'
+    }`}>
 =======
-                    <div className={`px-3 py-2 rounded-2xl max-w-[240px] text-sm shadow-sm ${
-                      message.sender === 'me' ? 'bg-[#ffe812] rounded-tr-none' : 'bg-white rounded-tl-none'
-                    }`}>
+                    <div className={`px-3 py-2 rounded-2xl max-w-[240px] text-sm shadow-sm ${message.sender === 'me' ? 'bg-[#ffe812] rounded-tr-none' : 'bg-white rounded-tl-none'
+      }`}>
 >>>>>>> upstream/main
-                      <p className="leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                    </div>
-                    {message.sender === 'other' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
-                  </div>
-                </div>
-              </div>
+      <p className="leading-relaxed whitespace-pre-wrap">{message.text}</p>
+    </div>
+    {message.sender === 'other' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
+  </div>
+                </div >
+              </div >
             );
           })}
-          <div ref={chatEndRef} />
-        </div>
+<div ref={chatEndRef} />
+        </div >
 <<<<<<< HEAD
 
-        {/* 입력창 UI 복구 */}
-        <form onSubmit={handleSendMessage} className="bg-white p-3 flex items-center gap-2 border-t border-gray-100">
+  {/* 입력창 UI 복구 */ }
+  < form onSubmit = { handleSendMessage } className = "bg-white p-3 flex items-center gap-2 border-t border-gray-100" >
           <button
             type="button"
             onClick={handleToggleListening}
@@ -636,45 +632,45 @@ const renderIntro = () => (
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
             </svg>
           </button>
-        </form>
+        </form >
 =======
 >>>>>>> upstream/main
-      </div>
-    </div>
+      </div >
+    </div >
   );
 
-  const renderReport = () => {
-    // 1. 초기 데이터 구조 설정 (이중 분석 필드 추가)
-    const data = analysisResult || {
-      score: 0,
-      grade: "분석 중",
-      comment: "데이터를 불러오는 중입니다...",
-      details: { detected_keywords: [] },
-      ai_analysis: [],
-      user_analysis: []
-    };
+const renderReport = () => {
+  // 1. 초기 데이터 구조 설정 (이중 분석 필드 추가)
+  const data = analysisResult || {
+    score: 0,
+    grade: "분석 중",
+    comment: "데이터를 불러오는 중입니다...",
+    details: { detected_keywords: [] },
+    ai_analysis: [],
+    user_analysis: []
+  };
 
-    if (!data.ai_analysis?.length && !data.user_analysis?.length) {
+  if (!data.ai_analysis?.length && !data.user_analysis?.length) {
 <<<<<<< HEAD
-      return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 font-sans">
-          <div className="bg-white p-12 rounded-[2.5rem] shadow-xl max-w-md w-full text-center border border-slate-200">
-            <div className="text-6xl mb-6">ℹ️</div>
-            <h2 className="text-2xl font-black text-slate-900 mb-4">대화 내역이 없습니다</h2>
-            <p className="text-slate-500 mb-10 leading-relaxed">
-              분석할 수 있는 대화 내용이 존재하지 않습니다.<br />
-              시나리오를 선택하여 훈련을 먼저 진행해 주세요.
-            </p>
-            <button
-              onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
-              className="w-full py-5 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg"
-            >
-              홈으로 돌아가기
-            </button>
-          </div>
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 font-sans">
+        <div className="bg-white p-12 rounded-[2.5rem] shadow-xl max-w-md w-full text-center border border-slate-200">
+          <div className="text-6xl mb-6">ℹ️</div>
+          <h2 className="text-2xl font-black text-slate-900 mb-4">대화 내역이 없습니다</h2>
+          <p className="text-slate-500 mb-10 leading-relaxed">
+            분석할 수 있는 대화 내용이 존재하지 않습니다.<br />
+            시나리오를 선택하여 훈련을 먼저 진행해 주세요.
+          </p>
+          <button
+            onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
+            className="w-full py-5 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg"
+          >
+            홈으로 돌아가기
+          </button>
         </div>
-      );
-    }
+      </div>
+    );
+  }
 =======
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 font-sans">
@@ -685,8 +681,8 @@ const renderIntro = () => (
             분석할 수 있는 대화 내용이 존재하지 않습니다.<br/>
             시나리오를 선택하여 훈련을 먼저 진행해 주세요.
           </p>
-          <button 
-            onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }} 
+          <button
+            onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
             className="w-full py-5 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg"
           >
             홈으로 돌아가기
@@ -697,78 +693,76 @@ const renderIntro = () => (
   }
 >>>>>>> upstream/main
 
-    const getScoreColor = (score) => {
-      if (score >= 80) return "text-emerald-500";
-      if (score >= 50) return "text-amber-500";
-      return "text-rose-500";
-    };
+  const getScoreColor = (score) => {
+    if (score >= 80) return "text-emerald-500";
+    if (score >= 50) return "text-amber-500";
+    return "text-rose-500";
+  };
 
-    // [개선] 기울임꼴과 큰따옴표를 제거한 정갈한 카드 렌더링
-    const renderSentenceCard = (m, type) => {
-      const isAI = type === 'ai';
-      return (
-<<<<<<< HEAD
-        <div className={`group relative p-4 rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md ${m.level === 'high' ? 'border-rose-100' : m.level === 'medium' ? 'border-amber-100' : 'border-slate-100'
-          }`}>
-          <div className="flex justify-between items-center mb-2">
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${m.level === 'high' ? 'bg-rose-50 text-rose-600' :
-              m.level === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
-              }`}>
-=======
-        <div className={`group relative p-4 rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md ${
-          m.level === 'high' ? 'border-rose-100' : m.level === 'medium' ? 'border-amber-100' : 'border-slate-100'
-        }`}>
-          <div className="flex justify-between items-center mb-2">
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-              m.level === 'high' ? 'bg-rose-50 text-rose-600' : 
-              m.level === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
-            }`}>
->>>>>>> upstream/main
-              {m.level === 'high' ? 'DANGER' : m.level === 'medium' ? 'WARNING' : 'SAFE'}
-            </span>
-            <span className="text-[10px] font-bold text-slate-400">
-              {isAI ? '수법 확률' : '유출 위험'}: {m.score}%
-            </span>
-          </div>
-          <p className="text-[14px] text-slate-700 font-semibold leading-relaxed">
-            {m.text}
-          </p>
-        </div>
-      );
-    };
-
+  // [개선] 기울임꼴과 큰따옴표를 제거한 정갈한 카드 렌더링
+  const renderSentenceCard = (m, type) => {
+    const isAI = type === 'ai';
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 md:p-8 font-sans">
-        {/* 가로형 모던 대시보드 레이아웃 */}
-        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/30 max-w-6xl w-full overflow-hidden border border-slate-200 flex flex-col md:h-[88vh]">
 <<<<<<< HEAD
-
+      <div className={`group relative p-4 rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md ${m.level === 'high' ? 'border-rose-100' : m.level === 'medium' ? 'border-amber-100' : 'border-slate-100'
+        }`}>
+        <div className="flex justify-between items-center mb-2">
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${m.level === 'high' ? 'bg-rose-50 text-rose-600' :
+            m.level === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
+            }`}>
 =======
-          
+        <div className={`group relative p-4 rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md ${m.level === 'high' ? 'border-rose-100' : m.level === 'medium' ? 'border-amber-100' : 'border-slate-100'
+              }`}>
+              <div className="flex justify-between items-center mb-2">
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${m.level === 'high' ? 'bg-rose-50 text-rose-600' :
+                    m.level === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
+                  }`}>
 >>>>>>> upstream/main
-          {/* Header Section: 요약 정보 및 최종 점수 */}
-          <div className="flex flex-col md:flex-row bg-white">
-            <div className="flex-1 p-8 md:p-10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">시뮬레이션 진단 결과</h2>
+                  {m.level === 'high' ? 'DANGER' : m.level === 'medium' ? 'WARNING' : 'SAFE'}
+                </span>
+                <span className="text-[10px] font-bold text-slate-400">
+                  {isAI ? '수법 확률' : '유출 위험'}: {m.score}%
+                </span>
               </div>
-<<<<<<< HEAD
-
-=======
-              
->>>>>>> upstream/main
-              {/* [수정] 기울임꼴과 큰따옴표 제거한 메인 코멘트 */}
-              <div className="mt-6 p-6 rounded-2xl bg-slate-50 border border-slate-100">
-                <p className="text-lg font-bold text-slate-800 leading-relaxed">
-                  {data.comment}
-                </p>
-              </div>
+              <p className="text-[14px] text-slate-700 font-semibold leading-relaxed">
+                {m.text}
+              </p>
             </div>
+            );
+    };
 
-            <div className="w-full md:w-[320px] bg-slate-50/50 p-8 flex flex-col items-center justify-center border-l border-slate-100">
+            return (
+            <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 md:p-8 font-sans">
+              {/* 가로형 모던 대시보드 레이아웃 */}
+              <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/30 max-w-6xl w-full overflow-hidden border border-slate-200 flex flex-col md:h-[88vh]">
+<<<<<<< HEAD
+
+=======
+
+>>>>>>> upstream/main
+    {/* Header Section: 요약 정보 및 최종 점수 */ }
+    <div className="flex flex-col md:flex-row bg-white">
+      <div className="flex-1 p-8 md:p-10">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">시뮬레이션 진단 결과</h2>
+        </div>
+<<<<<<< HEAD
+
+=======
+
+>>>>>>> upstream/main
+    {/* [수정] 기울임꼴과 큰따옴표 제거한 메인 코멘트 */ }
+    <div className="mt-6 p-6 rounded-2xl bg-slate-50 border border-slate-100">
+      <p className="text-lg font-bold text-slate-800 leading-relaxed">
+        {data.comment}
+      </p>
+    </div>
+            </div >
+
+  <div className="w-full md:w-[320px] bg-slate-50/50 p-8 flex flex-col items-center justify-center border-l border-slate-100">
 <<<<<<< HEAD
               <div className={`text-7xl font-black mb-2 ${getScoreColor(data.score)}`}>
                 {data.score}<span className="text-2xl text-slate-300 ml-1">/100</span>
@@ -784,18 +778,18 @@ const renderIntro = () => (
                    등급: <span className={getScoreColor(data.score)}>{data.grade}</span>
                  </div>
 >>>>>>> upstream/main
-            </div>
-          </div>
+            </div >
+          </div >
 
-          {/* Analysis Section: 2열 가로 그리드 */}
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden border-t border-slate-100">
+  {/* Analysis Section: 2열 가로 그리드 */ }
+  < div className = "flex-1 flex flex-col md:flex-row overflow-hidden border-t border-slate-100" >
 <<<<<<< HEAD
 
 =======
-            
+
 >>>>>>> upstream/main
-            {/* 좌측: AI 공격 데이터 분석 */}
-            <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto border-r border-slate-100 bg-[#fcfdfe] custom-scrollbar">
+    {/* 좌측: AI 공격 데이터 분석 */ }
+    < div className = "flex-1 flex flex-col p-6 md:p-8 overflow-y-auto border-r border-slate-100 bg-[#fcfdfe] custom-scrollbar" >
               <div className="flex items-center gap-2 mb-6">
                 <span className="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
                 <h3 className="text-base font-black text-slate-800">피싱 공격 패턴 분석</h3>
@@ -803,10 +797,10 @@ const renderIntro = () => (
               <div className="space-y-4">
                 {data.ai_analysis.map((m, i) => renderSentenceCard(m, 'ai'))}
               </div>
-            </div>
+            </div >
 
-            {/* 우측: 나의 대응 데이터 분석 */}
-            <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto bg-white custom-scrollbar">
+  {/* 우측: 나의 대응 데이터 분석 */ }
+  < div className = "flex-1 flex flex-col p-6 md:p-8 overflow-y-auto bg-white custom-scrollbar" >
               <div className="flex items-center gap-2 mb-6">
                 <span className="w-1.5 h-6 bg-rose-500 rounded-full"></span>
                 <h3 className="text-base font-black text-slate-800">개인정보 노출 여부 분석</h3>
@@ -814,12 +808,12 @@ const renderIntro = () => (
               <div className="space-y-4">
                 {data.user_analysis.map((m, i) => renderSentenceCard(m, 'user'))}
               </div>
-            </div>
-          </div>
+            </div >
+          </div >
 
-          {/* Footer Section */}
-          <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-6">
+  {/* Footer Section */ }
+  < div className = "p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4" >
+    <div className="flex items-center gap-6">
 <<<<<<< HEAD
               <div className="text-xs font-bold text-slate-400">
                 SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0]}</span>
@@ -827,9 +821,9 @@ const renderIntro = () => (
               <div className="text-xs font-bold text-slate-400">
                 ENGINE: <span className="text-emerald-600 ml-1 font-black">PhishGuard v2.8</span>
               </div>
-            </div>
-            <button
-              onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
+            </div >
+  <button
+    onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
 =======
                <div className="text-xs font-bold text-slate-400">
                   SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0]}</span>
@@ -838,26 +832,26 @@ const renderIntro = () => (
                   ENGINE: <span className="text-emerald-600 ml-1 font-black">PhishGuard v2.8</span>
                </div>
             </div>
-            <button 
-              onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }} 
+            <button
+              onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
 >>>>>>> upstream/main
-              className="px-12 py-4 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
-            >
-              다시 도전하기
-            </button>
-          </div>
-        </div>
-      </div>
+    className="px-12 py-4 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
+  >
+    다시 도전하기
+  </button>
+          </div >
+        </div >
+      </div >
     );
   };
 
-  return (
-    <>
-      {view === 'intro' && renderIntro()}
-      {view === 'chat' && renderChat()}
-      {view === 'report' && renderReport()}
-    </>
-  );
+return (
+  <>
+    {view === 'intro' && renderIntro()}
+    {view === 'chat' && renderChat()}
+    {view === 'report' && renderReport()}
+  </>
+);
 };
 
 export default KakaoDemo;
