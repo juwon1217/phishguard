@@ -277,8 +277,8 @@ const KakaoDemo = () => {
                     key={s}
                     onClick={() => handleScenarioChange(s)}
                     className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${selectedScenario === s
-                        ? 'bg-blue-600 text-white shadow-md scale-105'
-                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      ? 'bg-blue-600 text-white shadow-md scale-105'
+                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                       }`}
                   >
                     {s.split('(')[0]} {/* 괄호 앞부분만 노출 (깔끔하게) */}
@@ -516,182 +516,183 @@ const KakaoDemo = () => {
         </section>
       </div>
     );
+  };
 
-    const renderChat = () => (
-      <div className="flex h-screen bg-gray-100 font-sans">
-        <div className="flex-1 flex flex-col max-w-lg mx-auto bg-[#b2c7d9] shadow-2xl relative overflow-hidden">
-          <div className="bg-[#b2c7d9]/90 backdrop-blur-sm p-4 flex justify-between items-center sticky top-0 z-10">
-            <div className="flex flex-col">
-              <span className="font-bold text-gray-800 text-sm">{selectedScenario}</span>
-              <span className="text-[10px] text-gray-600">실시간 대응 훈련 중</span>
+  const renderChat = () => (
+    <div className="flex h-screen bg-gray-100 font-sans">
+      <div className="flex-1 flex flex-col max-w-lg mx-auto bg-[#b2c7d9] shadow-2xl relative overflow-hidden">
+        <div className="bg-[#b2c7d9]/90 backdrop-blur-sm p-4 flex justify-between items-center sticky top-0 z-10">
+          <div className="flex flex-col">
+            <span className="font-bold text-gray-800 text-sm">{selectedScenario}</span>
+            <span className="text-[10px] text-gray-600">실시간 대응 훈련 중</span>
+          </div>
+          <button onClick={handleFinishChat} className="text-[10px] bg-red-500 text-white px-3 py-1.5 rounded-full font-bold hover:bg-red-600">
+            대화 종료
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => {
+            const currentProfile = SCENARIO_PROFILES[selectedScenario];
+            return (
+              <div key={message.id} className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+                {message.sender === 'other' && (
+                  <div className="w-10 h-10 rounded-2xl bg-white mr-2 flex items-center justify-center shadow-sm border border-gray-200 flex-shrink-0">
+                    <span className={`text-[10px] font-bold ${currentProfile.avatarColor}`}>{currentProfile.avatarText}</span>
+                  </div>
+                )}
+                <div className={`flex flex-col ${message.sender === 'me' ? 'items-end' : 'items-start'}`}>
+                  {message.sender === 'other' && <span className="text-[10px] text-gray-700 mb-1 ml-1">{currentProfile.name}</span>}
+                  <div className="flex items-end space-x-1">
+                    {message.sender === 'me' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
+                    <div className={`px-3 py-2 rounded-2xl max-w-[240px] text-sm shadow-sm ${message.sender === 'me' ? 'bg-[#ffe812] rounded-tr-none' : 'bg-white rounded-tl-none'
+                      }`}>
+                      <p className="leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                    </div>
+                    {message.sender === 'other' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
+                  </div>
+                </div >
+              </div >
+            );
+          })}
+          <div ref={chatEndRef} />
+        </div >
+
+        {/* 입력창 UI */}
+        <form onSubmit={handleSendMessage} className="bg-white p-3 flex items-center gap-2 border-t border-gray-100">
+          <button
+            type="button"
+            onClick={handleToggleListening}
+            className={`p-2 rounded-full transition-colors ${isListening ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+            title="음성 입력"
+          >
+            {isListening ? (
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+              </svg>
+            )}
+          </button>
+
+          <input
+            ref={inputRef}
+            type="text"
+            className="flex-1 bg-gray-100 text-gray-800 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder-gray-400 transition-shadow"
+            placeholder="메시지 입력..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            disabled={isLoading}
+          />
+
+          <button
+            type="submit"
+            disabled={isLoading || !inputValue.trim()}
+            className="p-2 bg-[#ffe812] text-gray-900 rounded-full hover:bg-[#ffe000] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+
+  const renderReport = () => {
+    // dataSafe guard
+    const data = analysisResult || { score: 0, comment: "분석 결과가 없습니다.", ai_analysis: [], user_analysis: [], grade: "F" };
+
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 md:p-8 font-sans">
+        {/* 가로형 모던 대시보드 레이아웃 */}
+        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/30 max-w-6xl w-full overflow-hidden border border-slate-200 flex flex-col md:h-[88vh]">
+
+          {/* Header Section: 요약 정보 및 최종 점수 */}
+          <div className="flex flex-col md:flex-row bg-white">
+            <div className="flex-1 p-8 md:p-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                </div>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">시뮬레이션 진단 결과</h2>
+              </div>
+
+              {/* 메인 코멘트 */}
+              <div className="mt-6 p-6 rounded-2xl bg-slate-50 border border-slate-100">
+                <p className="text-lg font-bold text-slate-800 leading-relaxed">
+                  {data.comment}
+                </p>
+              </div>
             </div>
-            <button onClick={handleFinishChat} className="text-[10px] bg-red-500 text-white px-3 py-1.5 rounded-full font-bold hover:bg-red-600">
-              대화 종료
+
+            <div className="w-full md:w-[320px] bg-slate-50/50 p-8 flex flex-col items-center justify-center border-l border-slate-100">
+              <div className={`text-7xl font-black mb-2 ${getScoreColor(data.score)}`}>
+                {data.score}<span className="text-2xl text-slate-300 ml-1">/100</span>
+              </div>
+              <div className="text-[12px] font-bold text-slate-500 uppercase tracking-widest bg-white px-5 py-2 rounded-full shadow-sm border border-slate-100">
+                등급: <span className={getScoreColor(data.score)}>{data.grade}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Analysis Section: 2열 가로 그리드 */}
+          <div className="flex-1 flex flex-col md:flex-row overflow-hidden border-t border-slate-100">
+
+            {/* 좌측: AI 공격 데이터 분석 */}
+            <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto border-r border-slate-100 bg-[#fcfdfe] custom-scrollbar">
+              <div className="flex items-center gap-2 mb-6">
+                <span className="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
+                <h3 className="text-base font-black text-slate-800">피싱 공격 패턴 분석</h3>
+              </div>
+              <div className="space-y-4">
+                {data.ai_analysis.map((m, i) => renderSentenceCard(m, 'ai'))}
+              </div>
+            </div>
+
+            {/* 우측: 나의 대응 데이터 분석 */}
+            <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto bg-white custom-scrollbar">
+              <div className="flex items-center gap-2 mb-6">
+                <span className="w-1.5 h-6 bg-rose-500 rounded-full"></span>
+                <h3 className="text-base font-black text-slate-800">개인정보 노출 여부 분석</h3>
+              </div>
+              <div className="space-y-4">
+                {data.user_analysis.map((m, i) => renderSentenceCard(m, 'user'))}
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Section */}
+          <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-6">
+              <div className="text-xs font-bold text-slate-400">
+                SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0]}</span>
+              </div>
+              <div className="text-xs font-bold text-slate-400">
+                ENGINE: <span className="text-emerald-600 ml-1 font-black">PhishGuard v2.8</span>
+              </div>
+            </div>
+            <button
+              onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
+              className="px-12 py-4 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
+            >
+              다시 도전하기
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => {
-              const currentProfile = SCENARIO_PROFILES[selectedScenario];
-              return (
-                <div key={message.id} className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
-                  {message.sender === 'other' && (
-                    <div className="w-10 h-10 rounded-2xl bg-white mr-2 flex items-center justify-center shadow-sm border border-gray-200 flex-shrink-0">
-                      <span className={`text-[10px] font-bold ${currentProfile.avatarColor}`}>{currentProfile.avatarText}</span>
-                    </div>
-                  )}
-                  <div className={`flex flex-col ${message.sender === 'me' ? 'items-end' : 'items-start'}`}>
-                    {message.sender === 'other' && <span className="text-[10px] text-gray-700 mb-1 ml-1">{currentProfile.name}</span>}
-                    <div className="flex items-end space-x-1">
-                      {message.sender === 'me' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
-                      <div className={`px-3 py-2 rounded-2xl max-w-[240px] text-sm shadow-sm ${message.sender === 'me' ? 'bg-[#ffe812] rounded-tr-none' : 'bg-white rounded-tl-none'
-                        }`}>
-                        <p className="leading-relaxed whitespace-pre-wrap">{message.text}</p>
-                      </div>
-                      {message.sender === 'other' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
-                    </div>
-                  </div >
-                </div >
-              );
-            })}
-            <div ref={chatEndRef} />
-          </div >
-
-          {/* 입력창 UI */}
-          <form onSubmit={handleSendMessage} className="bg-white p-3 flex items-center gap-2 border-t border-gray-100">
-            <button
-              type="button"
-              onClick={handleToggleListening}
-              className={`p-2 rounded-full transition-colors ${isListening ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
-              title="음성 입력"
-            >
-              {isListening ? (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-                </svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
-                </svg>
-              )}
-            </button>
-
-            <input
-              ref={inputRef}
-              type="text"
-              className="flex-1 bg-gray-100 text-gray-800 rounded-full px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder-gray-400 transition-shadow"
-              placeholder="메시지 입력..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              disabled={isLoading}
-            />
-
-            <button
-              type="submit"
-              disabled={isLoading || !inputValue.trim()}
-              className="p-2 bg-[#ffe812] text-gray-900 rounded-full hover:bg-[#ffe000] disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-              </svg>
-            </button>
-          </form>
         </div>
       </div>
     );
-
-    const renderReport = () => {
-      // dataSafe guard
-      const data = analysisResult || { score: 0, comment: "분석 결과가 없습니다.", ai_analysis: [], user_analysis: [], grade: "F" };
-
-      return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 md:p-8 font-sans">
-          {/* 가로형 모던 대시보드 레이아웃 */}
-          <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/30 max-w-6xl w-full overflow-hidden border border-slate-200 flex flex-col md:h-[88vh]">
-
-            {/* Header Section: 요약 정보 및 최종 점수 */}
-            <div className="flex flex-col md:flex-row bg-white">
-              <div className="flex-1 p-8 md:p-10">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                  </div>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">시뮬레이션 진단 결과</h2>
-                </div>
-
-                {/* 메인 코멘트 */}
-                <div className="mt-6 p-6 rounded-2xl bg-slate-50 border border-slate-100">
-                  <p className="text-lg font-bold text-slate-800 leading-relaxed">
-                    {data.comment}
-                  </p>
-                </div>
-              </div>
-
-              <div className="w-full md:w-[320px] bg-slate-50/50 p-8 flex flex-col items-center justify-center border-l border-slate-100">
-                <div className={`text-7xl font-black mb-2 ${getScoreColor(data.score)}`}>
-                  {data.score}<span className="text-2xl text-slate-300 ml-1">/100</span>
-                </div>
-                <div className="text-[12px] font-bold text-slate-500 uppercase tracking-widest bg-white px-5 py-2 rounded-full shadow-sm border border-slate-100">
-                  등급: <span className={getScoreColor(data.score)}>{data.grade}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Analysis Section: 2열 가로 그리드 */}
-            <div className="flex-1 flex flex-col md:flex-row overflow-hidden border-t border-slate-100">
-
-              {/* 좌측: AI 공격 데이터 분석 */}
-              <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto border-r border-slate-100 bg-[#fcfdfe] custom-scrollbar">
-                <div className="flex items-center gap-2 mb-6">
-                  <span className="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
-                  <h3 className="text-base font-black text-slate-800">피싱 공격 패턴 분석</h3>
-                </div>
-                <div className="space-y-4">
-                  {data.ai_analysis.map((m, i) => renderSentenceCard(m, 'ai'))}
-                </div>
-              </div>
-
-              {/* 우측: 나의 대응 데이터 분석 */}
-              <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto bg-white custom-scrollbar">
-                <div className="flex items-center gap-2 mb-6">
-                  <span className="w-1.5 h-6 bg-rose-500 rounded-full"></span>
-                  <h3 className="text-base font-black text-slate-800">개인정보 노출 여부 분석</h3>
-                </div>
-                <div className="space-y-4">
-                  {data.user_analysis.map((m, i) => renderSentenceCard(m, 'user'))}
-                </div>
-              </div>
-            </div>
-
-            {/* Footer Section */}
-            <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-6">
-                <div className="text-xs font-bold text-slate-400">
-                  SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0]}</span>
-                </div>
-                <div className="text-xs font-bold text-slate-400">
-                  ENGINE: <span className="text-emerald-600 ml-1 font-black">PhishGuard v2.8</span>
-                </div>
-              </div>
-              <button
-                onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
-                className="px-12 py-4 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
-              >
-                다시 도전하기
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
-    return (
-      <>
-        {view === 'intro' && renderIntro()}
-        {view === 'chat' && renderChat()}
-        {view === 'report' && renderReport()}
-      </>
-    );
   };
 
-  export default KakaoDemo;
+  return (
+    <>
+      {view === 'intro' && renderIntro()}
+      {view === 'chat' && renderChat()}
+      {view === 'report' && renderReport()}
+    </>
+  );
+};
+
+export default KakaoDemo;
