@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
-from simulator.model import get_phishing_response # 우리가 만든 모델
+from simulator.ai_core import get_phishing_response # 우리가 만든 모델 (Renamed to force update)
 from analyzer import analyze_phishing_chat
 
 app = FastAPI()

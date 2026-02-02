@@ -94,6 +94,15 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
 - Goal: {info['goal']}
 - Tone: {info['tone']}
 
+"""
+
+    # [Context Injection] 첫 메시지 내용을 시스템 프롬프트에 주입하여 대화 일관성 확보
+    # App.jsx에서 전체 히스토리를 보내주지만, 모델이 첫 메시지를 '자신의 과거 발언'으로 인지하게끔 명시
+    if chat_history and len(chat_history) > 0 and chat_history[0]["role"] == "assistant":
+         first_msg_content = chat_history[0]["content"]
+         full_system_instruction += f"\n[CONTEXT MEMORY]\nYour conversation STARTED with you sending this message to the user:\n\"\"\"{first_msg_content}\"\"\"\nThe user's response is a reply to THIS message. Maintain consistency with your opening claim (e.g., the specific loan amount or threat mentioned above). Do NOT introduce yourself again if you already did."
+
+    full_system_instruction += """
 [Execution Guidelines]
 1. Start directly with the scam hook.
 2. If the user resists, escalate pressure (threaten legal action, pretend to cry, etc. depending on role).
