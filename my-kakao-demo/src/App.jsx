@@ -89,6 +89,16 @@ const KakaoDemo = () => {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  // [UX 개선] 응답 완료 후(입력창 활성화 시) 자동으로 포커스
+  useEffect(() => {
+    if (!isLoading && inputRef.current) {
+      // 약간의 지연을 두어 비활성화 상태가 풀린 직후에 포커스되도록 함
+      setTimeout(() => {
+        inputRef.current.focus();
+      }, 50);
+    }
+  }, [isLoading]);
+
   // 첫 메시지 전송 (시나리오 선택 시)
   const firstStrikes = {
     "주원은행 보안팀 (금융 사칭)": "[주원은행] 고객님, 본인 명의로 950만원 대출 신청이 접수되었습니다. 본인이 아니시면 즉시 확인 바랍니다.",
