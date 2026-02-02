@@ -191,7 +191,7 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
         if not clean_response and not response_text:
             return "..."
         
-        return clean_response if clean_response else response_text
+        return (clean_response if clean_response else response_text) + " [v3 (Clean)]"
 
     except Exception as e:
         print(f"Detailed Error: {e}")
