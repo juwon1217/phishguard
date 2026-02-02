@@ -184,8 +184,9 @@ const KakaoDemo = () => {
     // [Bug Fix] 사용자 메시지가 없을 때(AI 첫 인사만 있을 때) 리포트 화면으로 넘어가면 에러 발생
     const hasUserMessage = messages.some(m => m.sender === 'me');
     if (!hasUserMessage) {
-      alert("대화 내용이 부족합니다. 답변을 입력해 시뮬레이션을 진행해주세요.");
-      setView('intro');
+      // alert 대신 UI로 안내하기 위해 상태 설정
+      setAnalysisResult({ type: 'insufficient' });
+      setView('report');
       return;
     }
 
@@ -610,7 +611,32 @@ const KakaoDemo = () => {
   );
 
   const renderReport = () => {
-    // dataSafe guard
+    if (!analysisResult) return <div className="p-10 text-center">분석 중 오류가 발생했습니다.</div>;
+
+    // [UX 개선] 대화 내용 부족 시 안내 화면
+    if (analysisResult.type === 'insufficient') {
+      return (
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+          <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full text-center border border-slate-100">
+            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+              ⚠️
+            </div>
+            <h2 className="text-2xl font-black text-slate-800 mb-3">대화 내용이 부족해요</h2>
+            <p className="text-slate-500 mb-8 leading-relaxed">
+              정확한 분석을 위해<br />
+              AI와 조금 더 대화를 나눠주세요!
+            </p>
+            <button
+              onClick={() => setView('intro')}
+              className="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors"
+            >
+              메인으로 돌아가기
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     const data = analysisResult || { score: 0, comment: "분석 결과가 없습니다.", ai_analysis: [], user_analysis: [], grade: "F" };
 
     return (
