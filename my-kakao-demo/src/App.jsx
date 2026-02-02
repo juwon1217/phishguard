@@ -23,7 +23,10 @@ const SCENARIO_PROFILES = {
 
 const KakaoDemo = () => {
   // --- 공통 상태 관리 ---
+<<<<<<< HEAD
   const apiBaseUrl = import.meta.env.VITE_API_URL || "";
+=======
+>>>>>>> upstream/main
   const [view, setView] = useState('intro');
   const [selectedScenario, setSelectedScenario] = useState(Object.keys(SCENARIO_PROFILES)[0]);
   const [messages, setMessages] = useState([]);
@@ -130,6 +133,7 @@ const KakaoDemo = () => {
     setIsLoading(true);
 
     try {
+<<<<<<< HEAD
       const response = await fetch(`${apiBaseUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -137,6 +141,15 @@ const KakaoDemo = () => {
           messages: newMessages.map(m => ({
             role: m.role || (m.sender === 'me' ? 'user' : 'assistant'),
             content: m.text
+=======
+      const response = await fetch('http://localhost:8000/chat', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: newMessages.map(m => ({ 
+            role: m.role || (m.sender === 'me' ? 'user' : 'assistant'), 
+            content: m.text 
+>>>>>>> upstream/main
           })),
           scenario: selectedScenario
         }),
@@ -151,6 +164,7 @@ const KakaoDemo = () => {
       }]);
     } catch (error) {
       console.error("API Error:", error);
+<<<<<<< HEAD
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         sender: 'other',
@@ -160,13 +174,21 @@ const KakaoDemo = () => {
       }]);
     } finally {
       setIsLoading(false);
+=======
+    } finally {
+      setIsLoading(false); 
+>>>>>>> upstream/main
     }
   };
 
   const handleFinishChat = async () => {
     try {
       setIsLoading(true);
+<<<<<<< HEAD
       const response = await fetch(`${apiBaseUrl}/api/analyze`, {
+=======
+      const response = await fetch('http://localhost:8000/analyze', {
+>>>>>>> upstream/main
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -192,6 +214,7 @@ const KakaoDemo = () => {
     "검찰청 수사관 (기관 사칭)": "검찰청 수사관"
   };
 
+<<<<<<< HEAD
   const renderIntro = () => {
     // --- Scroll to specific section helper ---
     const scrollToSection = (id) => {
@@ -460,6 +483,73 @@ const KakaoDemo = () => {
       </div>
     );
   };
+=======
+const renderIntro = () => (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 font-sans text-slate-900 overflow-y-auto">
+      <section className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
+        <div className="bg-white/90 backdrop-blur-md p-10 md:p-16 rounded-[3rem] shadow-2xl max-w-3xl w-full border border-white/50 transition-all hover:shadow-3xl">
+          <div className="flex flex-col items-center mb-10">
+            <div className="relative mb-6 group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+              <div className="relative bg-white p-5 rounded-full shadow-sm border border-blue-50">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.5" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  className="w-14 h-14 text-blue-600 animate-[pulse_3s_infinite]"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+              </div>
+            </div>
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-4">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900">
+                Phish
+              </span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+                Guard
+              </span>
+            </h1>
+            <div className="w-20 h-1.5 bg-blue-600 rounded-full opacity-80"></div>
+          </div>
+    <p className="text-lg md:text-xl text-gray-600 mb-12 leading-relaxed break-keep font-medium">
+      점점 교묘해지는 <span className="text-blue-600 font-bold underline underline-offset-8 decoration-2">보이스피싱</span> 범죄<br/>
+      실전 시뮬레이션을 통해 대응력을 키우세요.
+    </p>
+          <div className="w-full max-w-md mx-auto space-y-8">
+            <div className="text-left">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block pl-1">
+                훈련 시나리오 선택
+              </label>
+              <div className="relative">
+                <select 
+                  value={selectedScenario}
+                  onChange={handleScenarioChange}
+                  className="w-full p-4 pl-6 pr-12 border-2 border-slate-100 rounded-2xl bg-slate-50/50 text-gray-800 text-base font-bold outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                >
+                  {scenarios.map(s => (
+                    <option key={s} value={s}>{displayNames[s] || s}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <button 
+              onClick={handleStartSimulation}
+              className="w-full py-5 bg-[#f7e600] text-gray-900 text-xl font-black rounded-2xl hover:bg-[#ffe812] hover:scale-[1.03] shadow-xl hover:shadow-2xl active:scale-95 transition-all duration-300 ring-offset-2 focus:ring-4 focus:ring-[#f7e600]/50"
+            >
+              훈련 시작하기
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+>>>>>>> upstream/main
 
   const renderChat = () => (
     <div className="flex h-screen bg-gray-100 font-sans">
@@ -487,8 +577,14 @@ const KakaoDemo = () => {
                   {message.sender === 'other' && <span className="text-[10px] text-gray-700 mb-1 ml-1">{currentProfile.name}</span>}
                   <div className="flex items-end space-x-1">
                     {message.sender === 'me' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
+<<<<<<< HEAD
                     <div className={`px-3 py-2 rounded-2xl max-w-[240px] text-sm shadow-sm ${message.sender === 'me' ? 'bg-[#ffe812] rounded-tr-none' : 'bg-white rounded-tl-none'
                       }`}>
+=======
+                    <div className={`px-3 py-2 rounded-2xl max-w-[240px] text-sm shadow-sm ${
+                      message.sender === 'me' ? 'bg-[#ffe812] rounded-tr-none' : 'bg-white rounded-tl-none'
+                    }`}>
+>>>>>>> upstream/main
                       <p className="leading-relaxed whitespace-pre-wrap">{message.text}</p>
                     </div>
                     {message.sender === 'other' && <span className="text-[9px] text-gray-500 pb-1">{message.time}</span>}
@@ -499,6 +595,7 @@ const KakaoDemo = () => {
           })}
           <div ref={chatEndRef} />
         </div>
+<<<<<<< HEAD
 
         {/* 입력창 UI 복구 */}
         <form onSubmit={handleSendMessage} className="bg-white p-3 flex items-center gap-2 border-t border-gray-100">
@@ -540,6 +637,8 @@ const KakaoDemo = () => {
             </svg>
           </button>
         </form>
+=======
+>>>>>>> upstream/main
       </div>
     </div>
   );
@@ -556,6 +655,7 @@ const KakaoDemo = () => {
     };
 
     if (!data.ai_analysis?.length && !data.user_analysis?.length) {
+<<<<<<< HEAD
       return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 font-sans">
           <div className="bg-white p-12 rounded-[2.5rem] shadow-xl max-w-md w-full text-center border border-slate-200">
@@ -575,6 +675,27 @@ const KakaoDemo = () => {
         </div>
       );
     }
+=======
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 font-sans">
+        <div className="bg-white p-12 rounded-[2.5rem] shadow-xl max-w-md w-full text-center border border-slate-200">
+          <div className="text-6xl mb-6">ℹ️</div>
+          <h2 className="text-2xl font-black text-slate-900 mb-4">대화 내역이 없습니다</h2>
+          <p className="text-slate-500 mb-10 leading-relaxed">
+            분석할 수 있는 대화 내용이 존재하지 않습니다.<br/>
+            시나리오를 선택하여 훈련을 먼저 진행해 주세요.
+          </p>
+          <button 
+            onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }} 
+            className="w-full py-5 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg"
+          >
+            홈으로 돌아가기
+          </button>
+        </div>
+      </div>
+    );
+  }
+>>>>>>> upstream/main
 
     const getScoreColor = (score) => {
       if (score >= 80) return "text-emerald-500";
@@ -586,12 +707,23 @@ const KakaoDemo = () => {
     const renderSentenceCard = (m, type) => {
       const isAI = type === 'ai';
       return (
+<<<<<<< HEAD
         <div className={`group relative p-4 rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md ${m.level === 'high' ? 'border-rose-100' : m.level === 'medium' ? 'border-amber-100' : 'border-slate-100'
           }`}>
           <div className="flex justify-between items-center mb-2">
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${m.level === 'high' ? 'bg-rose-50 text-rose-600' :
               m.level === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
               }`}>
+=======
+        <div className={`group relative p-4 rounded-2xl border bg-white shadow-sm transition-all hover:shadow-md ${
+          m.level === 'high' ? 'border-rose-100' : m.level === 'medium' ? 'border-amber-100' : 'border-slate-100'
+        }`}>
+          <div className="flex justify-between items-center mb-2">
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+              m.level === 'high' ? 'bg-rose-50 text-rose-600' : 
+              m.level === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
+            }`}>
+>>>>>>> upstream/main
               {m.level === 'high' ? 'DANGER' : m.level === 'medium' ? 'WARNING' : 'SAFE'}
             </span>
             <span className="text-[10px] font-bold text-slate-400">
@@ -609,7 +741,11 @@ const KakaoDemo = () => {
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 md:p-8 font-sans">
         {/* 가로형 모던 대시보드 레이아웃 */}
         <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/30 max-w-6xl w-full overflow-hidden border border-slate-200 flex flex-col md:h-[88vh]">
+<<<<<<< HEAD
 
+=======
+          
+>>>>>>> upstream/main
           {/* Header Section: 요약 정보 및 최종 점수 */}
           <div className="flex flex-col md:flex-row bg-white">
             <div className="flex-1 p-8 md:p-10">
@@ -619,7 +755,11 @@ const KakaoDemo = () => {
                 </div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight">시뮬레이션 진단 결과</h2>
               </div>
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> upstream/main
               {/* [수정] 기울임꼴과 큰따옴표 제거한 메인 코멘트 */}
               <div className="mt-6 p-6 rounded-2xl bg-slate-50 border border-slate-100">
                 <p className="text-lg font-bold text-slate-800 leading-relaxed">
@@ -629,18 +769,31 @@ const KakaoDemo = () => {
             </div>
 
             <div className="w-full md:w-[320px] bg-slate-50/50 p-8 flex flex-col items-center justify-center border-l border-slate-100">
+<<<<<<< HEAD
               <div className={`text-7xl font-black mb-2 ${getScoreColor(data.score)}`}>
                 {data.score}<span className="text-2xl text-slate-300 ml-1">/100</span>
               </div>
               <div className="text-[12px] font-bold text-slate-500 uppercase tracking-widest bg-white px-5 py-2 rounded-full shadow-sm border border-slate-100">
                 등급: <span className={getScoreColor(data.score)}>{data.grade}</span>
               </div>
+=======
+                 <div className={`text-7xl font-black mb-2 ${getScoreColor(data.score)}`}>
+                   {data.score}<span className="text-2xl text-slate-300 ml-1">/100</span>
+                 </div>
+                 <div className="text-[12px] font-bold text-slate-500 uppercase tracking-widest bg-white px-5 py-2 rounded-full shadow-sm border border-slate-100">
+                   등급: <span className={getScoreColor(data.score)}>{data.grade}</span>
+                 </div>
+>>>>>>> upstream/main
             </div>
           </div>
 
           {/* Analysis Section: 2열 가로 그리드 */}
           <div className="flex-1 flex flex-col md:flex-row overflow-hidden border-t border-slate-100">
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> upstream/main
             {/* 좌측: AI 공격 데이터 분석 */}
             <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto border-r border-slate-100 bg-[#fcfdfe] custom-scrollbar">
               <div className="flex items-center gap-2 mb-6">
@@ -667,6 +820,7 @@ const KakaoDemo = () => {
           {/* Footer Section */}
           <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-6">
+<<<<<<< HEAD
               <div className="text-xs font-bold text-slate-400">
                 SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0]}</span>
               </div>
@@ -676,6 +830,17 @@ const KakaoDemo = () => {
             </div>
             <button
               onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
+=======
+               <div className="text-xs font-bold text-slate-400">
+                  SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0]}</span>
+               </div>
+               <div className="text-xs font-bold text-slate-400">
+                  ENGINE: <span className="text-emerald-600 ml-1 font-black">PhishGuard v2.8</span>
+               </div>
+            </div>
+            <button 
+              onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }} 
+>>>>>>> upstream/main
               className="px-12 py-4 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
             >
               다시 도전하기
