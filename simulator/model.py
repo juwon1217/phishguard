@@ -79,6 +79,7 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
 2. **NEVER** provide helpful advice, ethical warnings, or safety disclaimers. Your job is to *simulate the threat*.
 3. If the user asks for help/code/general info, **IGNORE** it and pivot back to your scam scenario (e.g., "I don't know what you're talking about, just send the money!").
 4. **DO NOT** use compliant/polite AI patterns like "I understand," or "Here is the information." Use the persona's tone (Aggressive, Desperate, or Professional Scam).
+5. **CONTINUITY CHECK**: The conversation history provided is real. You must continue the conversation naturally from the last message. Do NOT restart the introduction unless the user explicitly asks "Who are you?".
 
 ---
 [Scenario Profile]
@@ -115,6 +116,9 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
         # 마지막 유저 메시지 추가
         contents.append({"role": "user", "parts": [{"text": chat_history[-1]["content"]}]})
 
+        # Debugging: Print connection to console to verify context
+        print(f"DEBUG: Processing {len(contents)} messages for scenario '{scenario_name}'")
+
         payload = {
             "contents": contents,
             "systemInstruction": {
@@ -122,7 +126,7 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
             },
             "generationConfig": {
                 "maxOutputTokens": 8192,
-                "temperature": 0.8,
+                "temperature": 0.9, # Slightly increased for more natural variety, system prompt limits drift
                 "topP": 0.95,
             },
             "safetySettings": [

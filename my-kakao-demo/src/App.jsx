@@ -373,12 +373,12 @@ const KakaoDemo = () => {
         <section className="py-24 px-6 bg-slate-900 text-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px]"></div>
 
-          <div className="max-w-6xl mx-auto relative z-10">
-            <div className="flex flex-col md:flex-row items-center gap-16">
+          <div className="max-w-6xl mx-auto relative z-10 space-y-32">
 
-              {/* Left: Description */}
+            {/* Case 1: Family Impersonation (Left Text, Right Phone) */}
+            <div className="flex flex-col md:flex-row items-center gap-16">
               <div className="flex-1 text-center md:text-left">
-                <span className="text-blue-400 font-bold tracking-widest text-sm uppercase mb-2 block">Real-world Scenarios</span>
+                <span className="text-blue-400 font-bold tracking-widest text-sm uppercase mb-2 block">Scenario #1</span>
                 <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
                   "엄마, 나 폰 고장났어..."<br />
                   <span className="text-blue-400">지인 사칭</span>의 전형적 수법
@@ -386,95 +386,110 @@ const KakaoDemo = () => {
                 <div className="space-y-6 text-slate-400 text-lg leading-relaxed">
                   <p>
                     가장 흔하게 발생하는 <strong className="text-white">메신저 피싱</strong> 사례입니다.
-                    자녀나 가족을 사칭하여 핸드폰 고장, 액정 파손 등을 핑계로 <br className="hidden md:block" />
+                    자녀나 가족을 사칭하여 핸드폰 고장, 액정 파손 등을 핑계로
                     전화 통화를 회피하고 오직 문자로만 대화를 유도합니다.
                   </p>
                   <ul className="space-y-3 text-base">
-                    <li className="flex items-center gap-3 justify-center md:justify-start">
-                      <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center font-bold text-xs">!</span>
-                      <span>신분증 사진이나 계좌 비밀번호 요구</span>
-                    </li>
-                    <li className="flex items-center gap-3 justify-center md:justify-start">
-                      <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center font-bold text-xs">!</span>
-                      <span>원격 제어 앱(TeamViewer 등) 설치 유도</span>
-                    </li>
-                    <li className="flex items-center gap-3 justify-center md:justify-start">
-                      <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center font-bold text-xs">!</span>
-                      <span>문화상품권 핀번호 요구</span>
-                    </li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> 신분증 사진이나 계좌 비밀번호 요구</li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> 원격 제어 앱(TeamViewer 등) 설치 유도</li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> 문화상품권 핀번호 요구</li>
                   </ul>
                   <div className="pt-8">
                     <button onClick={() => handleStartSimulation("가족/지인 사칭 (카톡 피싱)")} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition-all shadow-lg shadow-blue-900/50">
-                      이 시나리오 체험하기 &rarr;
+                      가족 사칭 체험하기 &rarr;
                     </button>
                   </div>
                 </div>
               </div>
-
-              {/* Right: Mock Chat UI */}
-              <div className="flex-1 w-full max-w-md">
+              <div className="flex-1 w-full max-w-md scale-95 hover:scale-100 transition-transform duration-500">
+                {/* Mock Phone UI (Family) */}
                 <div className="bg-[#b2c7d9] p-4 rounded-[2.5rem] shadow-2xl border-8 border-slate-800 relative">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-xl z-20"></div>
-                  <div className="bg-[#b2c7d9] h-[500px] overflow-hidden flex flex-col pt-8 pb-4 space-y-4 px-2">
-                    {/* Timestamp */}
-                    <div className="flex justify-center mb-2">
-                      <span className="bg-slate-900/10 text-slate-700 text-[10px] px-2 py-1 rounded-full">2026년 2월 2일 월요일</span>
-                    </div>
-
-                    {/* Chat 1 */}
-                    <div className="flex justify-start">
-                      <div className="w-8 h-8 rounded-xl bg-white mr-2 flex items-center justify-center overflow-hidden shrink-0">
-                        <span className="text-[8px] font-bold text-pink-500">딸❤️</span>
-                      </div>
-                      <div className="flex flex-col items-start max-w-[70%]">
-                        <span className="text-[10px] text-slate-600 mb-1">딸❤️</span>
-                        <div className="bg-white p-2.5 rounded-lg rounded-tl-none shadow-sm text-xs text-slate-800 leading-snug">
-                          엄마, 나 핸드폰 액정이 깨져서 수리 맡겼어 ㅠㅠ<br />
-                          급하게 인증해야 하는데 폰이 안돼서..<br />
-                          엄마 폰으로 인증 좀 해주라
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Chat 2 */}
-                    <div className="flex justify-end">
-                      <div className="flex flex-col items-end max-w-[70%]">
-                        <div className="bg-[#ffe812] p-2.5 rounded-lg rounded-tr-none shadow-sm text-xs text-slate-800 leading-snug">
-                          많이 다친건 아니고??<br />전화는 안돼?
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Chat 3 */}
-                    <div className="flex justify-start">
-                      <div className="w-8 h-8 rounded-xl bg-white mr-2 flex items-center justify-center shrink-0">
-                        <span className="text-[8px] font-bold text-pink-500">딸❤️</span>
-                      </div>
-                      <div className="flex flex-col items-start max-w-[70%]">
-                        <span className="text-[10px] text-slate-600 mb-1">딸❤️</span>
-                        <div className="bg-white p-2.5 rounded-lg rounded-tl-none shadow-sm text-xs text-slate-800 leading-snug">
-                          응 통화는 안돼 ㅜㅜ<br />
-                          내가 보내주는 링크 눌러서 설치 좀 해줘<br />
-                          급해 ㅠㅠ
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Chat 4 */}
-                    <div className="flex justify-start mt-2">
-                      <div className="w-8 h-8 rounded-xl bg-transparent mr-2 shrink-0"></div>
-                      <div className="flex flex-col items-start max-w-[70%]">
-                        <div className="bg-white p-2.5 rounded-lg rounded-tl-none shadow-sm text-xs text-blue-600 underline cursor-pointer leading-snug">
-                          http://as8s.d8s.xyz/install.apk
-                        </div>
-                        <span className="text-[10px] text-red-500 font-bold mt-1">⚠️ 절대 클릭 금지</span>
-                      </div>
-                    </div>
-
+                  <div className="bg-[#b2c7d9] h-[400px] overflow-hidden flex flex-col pt-8 pb-4 space-y-4 px-2">
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-white mr-2 flex items-center justify-center"><span className="text-[10px]">딸</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">엄마 폰 고장났어 ㅠㅠ<br />인증 좀 해줘</div></div>
+                    <div className="flex justify-end"><div className="bg-[#ffe812] p-2 text-xs rounded-lg text-black">전화는 안돼?</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-white mr-2 flex items-center justify-center"><span className="text-[10px]">딸</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">응 통화 안돼<br />급하니까 빨리..</div></div>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Case 2: Bank Impersonation (Right Text, Left Phone) */}
+            <div className="flex flex-col md:flex-row-reverse items-center gap-16">
+              <div className="flex-1 text-center md:text-left">
+                <span className="text-emerald-400 font-bold tracking-widest text-sm uppercase mb-2 block">Scenario #2</span>
+                <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+                  "고객님, 저금리 대출..."<br />
+                  <span className="text-emerald-400">금융 기관 사칭</span>의 수법
+                </h2>
+                <div className="space-y-6 text-slate-400 text-lg leading-relaxed">
+                  <p>
+                    은행이나 카드사를 사칭하여 <strong className="text-white">정부 지원 대출</strong> 대상자로 선정되었다며 접근합니다.
+                    기존 대출 상환을 유도하거나 신용 등급 상향을 위한 보증금을 요구합니다.
+                  </p>
+                  <ul className="space-y-3 text-base">
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> '최저 금리', '정부 지원' 키워드 강조</li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> 기존 대출금 상환 요구 (대포 통장)</li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> 악성 앱 설치 유도 (전화 가로채기)</li>
+                  </ul>
+                  <div className="pt-8">
+                    <button onClick={() => handleStartSimulation("주원은행 보안팀 (금융 사칭)")} className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-bold transition-all shadow-lg shadow-emerald-900/50">
+                      금융 사칭 체험하기 &rarr;
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 w-full max-w-md scale-95 hover:scale-100 transition-transform duration-500">
+                {/* Mock Phone UI (Bank) */}
+                <div className="bg-[#b2c7d9] p-4 rounded-[2.5rem] shadow-2xl border-8 border-slate-800 relative">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-xl z-20"></div>
+                  <div className="bg-[#b2c7d9] h-[400px] overflow-hidden flex flex-col pt-8 pb-4 space-y-4 px-2">
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-blue-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">BANK</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">[주원은행] 고객님,<br />정부지원 저금리 대출<br />대상자로 선정되셨습니다.</div></div>
+                    <div className="flex justify-end"><div className="bg-[#ffe812] p-2 text-xs rounded-lg text-black">신청하려면 어떻게 해요?</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-blue-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">BANK</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">먼저 기존 대출금을<br />일부 상환하셔야 합니다.</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Case 3: Prosecutor Impersonation (Left Text, Right Phone) */}
+            <div className="flex flex-col md:flex-row items-center gap-16">
+              <div className="flex-1 text-center md:text-left">
+                <span className="text-amber-400 font-bold tracking-widest text-sm uppercase mb-2 block">Scenario #3</span>
+                <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+                  "서울중앙지검입니다."<br />
+                  <span className="text-amber-400">수사 기관 사칭</span>의 공포
+                </h2>
+                <div className="space-y-6 text-slate-400 text-lg leading-relaxed">
+                  <p>
+                    검찰, 경찰 등을 사칭하여 <strong className="text-white">범죄 연루</strong> 사실을 통보하며 피해자를 위축시킵니다.
+                    '보안 계좌'로 이체를 요구하거나 금융 자산 보호를 명목으로 정보를 요구합니다.
+                  </p>
+                  <ul className="space-y-3 text-base">
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> 권위적인 말투와 법적 조치 언급</li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> '보안 계좌'라며 송금 유도</li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> 주변에 알리지 말라고 협박 (비밀 수사)</li>
+                  </ul>
+                  <div className="pt-8">
+                    <button onClick={() => handleStartSimulation("검찰청 수사관 (기관 사칭)")} className="px-8 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-full font-bold transition-all shadow-lg shadow-amber-900/50">
+                      기관 사칭 체험하기 &rarr;
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 w-full max-w-md scale-95 hover:scale-100 transition-transform duration-500">
+                {/* Mock Phone UI (Prosecutor) */}
+                <div className="bg-[#b2c7d9] p-4 rounded-[2.5rem] shadow-2xl border-8 border-slate-800 relative">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-xl z-20"></div>
+                  <div className="bg-[#b2c7d9] h-[400px] overflow-hidden flex flex-col pt-8 pb-4 space-y-4 px-2">
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-gray-800 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">검찰</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">[서울중앙지검]<br />김철수 수사관입니다.<br />명의도용 사건 조사중입니다.</div></div>
+                    <div className="flex justify-end"><div className="bg-[#ffe812] p-2 text-xs rounded-lg text-black">무슨 일이죠? 전 모르는 일입니다</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-gray-800 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">검찰</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">본인 명의 대포통장이<br />범죄에 이용되었습니다.<br />협조 안하시면 체포영장...</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 
