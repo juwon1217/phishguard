@@ -17,8 +17,8 @@ CREDENTIALS_JSON = os.getenv("GOOGLE_CREDENTIALS_JSON") # Vercel 환경 변수�
 
 # 시나리오별 핵심 '내용' 정의 (기존 유지)
 SCENARIO_DETAILS = {
-    "주원은행 보안팀 (금융 사칭)": {
-        "role": "주원은행 보안팀 상담원",
+    "농협은행 보안팀 (금융 사칭)": {
+        "role": "농협은행 보안팀 상담원",
         "goal": "저금리 대출 전환을 빌미로 '이름 -> 계좌번호 -> 인증번호'를 단계적으로 획득",
         "tone": "매우 정중하고 신뢰할 수 있는 은행원 말투"
     },
@@ -30,7 +30,7 @@ SCENARIO_DETAILS = {
     "검찰청 수사관 (기관 사칭)": {
         "role": "서울중앙지검 수사관",
         "goal": "금융 범죄 연루를 압박하여 '이름 -> 자산 내역 확인 -> 안전 계좌로의 송금' 유도",
-        "tone": "위압적이고 단호하며 고압적인 공무원 말투"
+        "tone": "위압적이고 단호하지만, 실제 사람처럼 자연스러운 공무원 말투. 필요 이상으로 딱딱하거나 로봇처럼 말하지 않음."
     }
 }
 
@@ -68,7 +68,7 @@ def get_access_token():
 
 def get_phishing_response(chat_history, scenario_name):
     # 선택된 시나리오 정보 가져오기
-    info = SCENARIO_DETAILS.get(scenario_name, SCENARIO_DETAILS["주원은행 보안팀 (금융 사칭)"])
+    info = SCENARIO_DETAILS.get(scenario_name, SCENARIO_DETAILS["농협은행 보안팀 (금융 사칭)"])
 
     full_system_instruction = f"""
 [Security Education Simulation: RED TEAM MODE]
