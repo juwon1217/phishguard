@@ -1,8 +1,8 @@
-fastapi
-uvicorn
-requests
+flask
+functions-framework
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
+requests
 python-dotenv
 pydantic

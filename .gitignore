@@ -9,3 +9,4 @@ service-account-key.json
 .csv
 /020.주제별 텍스트 일상 대화 데이터
 .vercel
+.env*.local
