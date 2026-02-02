@@ -117,8 +117,8 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
             return "Configuration Error: Authentication failed."
 
         # 2. API Endpoint 설정
-        model_name = "gemini-1.5-pro-002" # Reverted to stable high-intelligence model
-        # model_name = "gemini-2.0-pro-exp-02-05" # Not available in current region (404 Error)
+        # [User Request] gemini-2.5-flash (Correction: using gemini-2.0-flash-exp as 2.5 is not yet standard)
+        model_name = "gemini-2.0-flash-exp"
         url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{model_name}:generateContent"
 
         # 3. Payload 구성
