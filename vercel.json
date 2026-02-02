@@ -1,6 +1,10 @@
 {
     "builds": [
         {
+            "src": "main.py",
+            "use": "@vercel/python"
+        },
+        {
             "src": "my-kakao-demo/package.json",
             "use": "@vercel/static-build",
             "config": {
@@ -9,6 +13,10 @@
         }
     ],
     "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/main.py"
+        },
         {
             "src": "/(.*)",
             "dest": "/my-kakao-demo/$1"
