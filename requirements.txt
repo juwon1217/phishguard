@@ -2,7 +2,6 @@ fastapi
 uvicorn
 pydantic
 python-dotenv
-<<<<<<< HEAD
 fastapi
 uvicorn
 pydantic
@@ -13,6 +12,4 @@ pandas
 scikit-learn
 xgboost
 openpyxl
-=======
 google-cloud-aiplatform
->>>>>>> upstream/main
