@@ -192,71 +192,274 @@ const KakaoDemo = () => {
     "검찰청 수사관 (기관 사칭)": "검찰청 수사관"
   };
 
-  const renderIntro = () => (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 font-sans text-slate-900 overflow-y-auto">
-      <section className="flex flex-col items-center justify-center min-h-screen p-6 text-center">
-        <div className="bg-white/90 backdrop-blur-md p-10 md:p-16 rounded-[3rem] shadow-2xl max-w-3xl w-full border border-white/50 transition-all hover:shadow-3xl">
-          <div className="flex flex-col items-center mb-10">
-            <div className="relative mb-6 group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-              <div className="relative bg-white p-5 rounded-full shadow-sm border border-blue-50">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-14 h-14 text-blue-600 animate-[pulse_3s_infinite]"
-                >
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
-              </div>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none mb-4">
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900">
-                Phish
-              </span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-                Guard
-              </span>
-            </h1>
-            <div className="w-20 h-1.5 bg-blue-600 rounded-full opacity-80"></div>
+  const renderIntro = () => {
+    // --- Scroll to specific section helper ---
+    const scrollToSection = (id) => {
+      const element = document.getElementById(id);
+      element?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    return (
+      <div className="min-h-screen bg-slate-50 font-sans text-slate-900 overflow-y-auto scroll-smooth">
+
+        {/* --- 1. HERO SECTION --- */}
+        <section className="relative min-h-screen flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+          {/* Background Gradient Orbs */}
+          <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-blue-200/30 rounded-full blur-[120px] animate-pulse"></div>
+            <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-indigo-200/30 rounded-full blur-[100px] animate-pulse delay-1000"></div>
           </div>
-          <p className="text-lg md:text-xl text-gray-600 mb-12 leading-relaxed break-keep font-medium">
-            점점 교묘해지는 <span className="text-blue-600 font-bold underline underline-offset-8 decoration-2">보이스피싱</span> 범죄<br />
-            실전 시뮬레이션을 통해 대응력을 키우세요.
-          </p>
-          <div className="w-full max-w-md mx-auto space-y-8">
-            <div className="text-left">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block pl-1">
-                훈련 시나리오 선택
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedScenario}
-                  onChange={handleScenarioChange}
-                  className="w-full p-4 pl-6 pr-12 border-2 border-slate-100 rounded-2xl bg-slate-50/50 text-gray-800 text-base font-bold outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
-                >
-                  {scenarios.map(s => (
-                    <option key={s} value={s}>{displayNames[s] || s}</option>
-                  ))}
-                </select>
+
+          <div className="relative z-10 bg-white/80 backdrop-blur-xl p-10 md:p-16 rounded-[3rem] shadow-2xl max-w-4xl w-full border border-white/50 ring-1 ring-slate-100/50">
+            <div className="flex flex-col items-center mb-10">
+              <div className="relative mb-8 group cursor-default">
+                <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full blur-lg opacity-30 group-hover:opacity-60 transition duration-500"></div>
+                <div className="relative bg-white p-6 rounded-full shadow-lg border border-blue-50">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16 text-blue-600">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="m9 12 2 2 4-4" />
+                  </svg>
+                </div>
+              </div>
+
+              <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none mb-6">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">Phish</span>
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Guard</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-slate-500 font-medium tracking-tight mb-8">
+                대한민국 No.1 피싱범죄 대응 훈련 시뮬레이터
+              </p>
+
+              {/* Main Action Area */}
+              <div className="w-full max-w-md mx-auto space-y-6">
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-200"></div>
+                  <button
+                    onClick={handleStartSimulation}
+                    className="relative w-full py-5 bg-[#f7e600] text-gray-900 text-xl font-black rounded-2xl hover:scale-[1.02] active:scale-95 transition-all duration-200 shadow-xl flex items-center justify-center gap-3"
+                  >
+                    <span>⚡ 실전 훈련 시작하기</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm font-bold text-slate-500">
+                    👮 경찰청 데이터 기반
+                  </div>
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm font-bold text-slate-500">
+                    🤖 AI 실시간 분석
+                  </div>
+                </div>
               </div>
             </div>
-            <button
-              onClick={handleStartSimulation}
-              className="w-full py-5 bg-[#f7e600] text-gray-900 text-xl font-black rounded-2xl hover:bg-[#ffe812] hover:scale-[1.03] shadow-xl hover:shadow-2xl active:scale-95 transition-all duration-300 ring-offset-2 focus:ring-4 focus:ring-[#f7e600]/50"
+
+            {/* Scroll Indicator */}
+            <div
+              onClick={() => scrollToSection('info-section')}
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer animate-bounce text-slate-400 hover:text-blue-600 transition-colors"
             >
-              훈련 시작하기
-            </button>
+              <span className="text-xs font-bold uppercase tracking-widest">Learn More</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
-  );
+        </section>
+
+        {/* --- 2. INFO SECTION (WHAT IS PHISHING) --- */}
+        <section id="info-section" className="py-24 px-6 bg-white relative">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-20">
+              <span className="text-blue-600 font-black tracking-widest text-sm uppercase mb-2 block">Knowledge Base</span>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">피싱(Phishing)이란?</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                <strong className="text-slate-900">Private Data(개인정보)</strong>와 <strong className="text-slate-900">Fishing(낚시)</strong>의 합성어로,
+                전기통신수단을 이용하여 피해자를 속여 개인정보와 금융정보를 탈취하는 악질적인 사기 수법입니다.
+              </p>
+            </div>
+
+            {/* Types Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { icon: "📞", title: "보이스피싱", desc: "검찰, 경찰 등 기관을 사칭하거나 가족 납치 등을 빙자하여 송금을 요구" },
+                { icon: "💬", title: "메신저피싱", desc: "카톡 등에서 가족/지인을 사칭하여 급전이나 상품권 구매를 요구" },
+                { icon: "🌐", title: "피싱사이트", desc: "정상 홈페이지와 유사한 가짜 사이트로 접속을 유도하여 정보 탈취" },
+                { icon: "📸", title: "몸캠피싱", desc: "화상 채팅 후 녹화된 영상을 지인에게 유포하겠다고 협박" },
+                { icon: "🎯", title: "스피어피싱", desc: "특정 개인이나 회사를 타겟으로 정밀하게 설계된 이메일 공격" },
+                { icon: "📱", title: "큐싱 (Qshing)", desc: "QR코드를 촬영하면 악성 앱이 설치되도록 유도하는 신종 수법" },
+                { icon: "💔", title: "로맨스스캠", desc: "SNS에서 이성에게 접근하여 친분을 쌓은 뒤 금전을 요구" }
+              ].map((item, idx) => (
+                <div key={idx} className="bg-slate-50 p-8 rounded-3xl border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
+                  <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+              <div className="bg-blue-600 p-8 rounded-3xl text-white flex flex-col justify-center items-center text-center shadow-lg shadow-blue-200">
+                <h3 className="text-2xl font-black mb-2">가장 중요한 건</h3>
+                <p className="font-medium text-blue-100">"절대 속지 않는<br />단단한 마음가짐"</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- 3. EXAMPLES SECTION (REAL CASES) --- */}
+        <section className="py-24 px-6 bg-slate-900 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px]"></div>
+
+          <div className="max-w-6xl mx-auto relative z-10">
+            <div className="flex flex-col md:flex-row items-center gap-16">
+
+              {/* Left: Description */}
+              <div className="flex-1 text-center md:text-left">
+                <span className="text-blue-400 font-bold tracking-widest text-sm uppercase mb-2 block">Real-world Scenarios</span>
+                <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
+                  "엄마, 나 폰 고장났어..."<br />
+                  <span className="text-blue-400">지인 사칭</span>의 전형적 수법
+                </h2>
+                <div className="space-y-6 text-slate-400 text-lg leading-relaxed">
+                  <p>
+                    가장 흔하게 발생하는 <strong className="text-white">메신저 피싱</strong> 사례입니다.
+                    자녀나 가족을 사칭하여 핸드폰 고장, 액정 파손 등을 핑계로 <br className="hidden md:block" />
+                    전화 통화를 회피하고 오직 문자로만 대화를 유도합니다.
+                  </p>
+                  <ul className="space-y-3 text-base">
+                    <li className="flex items-center gap-3 justify-center md:justify-start">
+                      <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center font-bold text-xs">!</span>
+                      <span>신분증 사진이나 계좌 비밀번호 요구</span>
+                    </li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start">
+                      <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center font-bold text-xs">!</span>
+                      <span>원격 제어 앱(TeamViewer 등) 설치 유도</span>
+                    </li>
+                    <li className="flex items-center gap-3 justify-center md:justify-start">
+                      <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center font-bold text-xs">!</span>
+                      <span>문화상품권 핀번호 요구</span>
+                    </li>
+                  </ul>
+                  <div className="pt-8">
+                    <button onClick={() => { setSelectedScenario("가족/지인 사칭 (카톡 피싱)"); handleStartSimulation(); }} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition-all shadow-lg shadow-blue-900/50">
+                      이 시나리오 체험하기 &rarr;
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Mock Chat UI */}
+              <div className="flex-1 w-full max-w-md">
+                <div className="bg-[#b2c7d9] p-4 rounded-[2.5rem] shadow-2xl border-8 border-slate-800 relative">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-xl z-20"></div>
+                  <div className="bg-[#b2c7d9] h-[500px] overflow-hidden flex flex-col pt-8 pb-4 space-y-4 px-2">
+                    {/* Timestamp */}
+                    <div className="flex justify-center mb-2">
+                      <span className="bg-slate-900/10 text-slate-700 text-[10px] px-2 py-1 rounded-full">2026년 2월 2일 월요일</span>
+                    </div>
+
+                    {/* Chat 1 */}
+                    <div className="flex justify-start">
+                      <div className="w-8 h-8 rounded-xl bg-white mr-2 flex items-center justify-center overflow-hidden shrink-0">
+                        <span className="text-[8px] font-bold text-pink-500">딸❤️</span>
+                      </div>
+                      <div className="flex flex-col items-start max-w-[70%]">
+                        <span className="text-[10px] text-slate-600 mb-1">딸❤️</span>
+                        <div className="bg-white p-2.5 rounded-lg rounded-tl-none shadow-sm text-xs text-slate-800 leading-snug">
+                          엄마, 나 핸드폰 액정이 깨져서 수리 맡겼어 ㅠㅠ<br />
+                          급하게 인증해야 하는데 폰이 안돼서..<br />
+                          엄마 폰으로 인증 좀 해주라
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Chat 2 */}
+                    <div className="flex justify-end">
+                      <div className="flex flex-col items-end max-w-[70%]">
+                        <div className="bg-[#ffe812] p-2.5 rounded-lg rounded-tr-none shadow-sm text-xs text-slate-800 leading-snug">
+                          많이 다친건 아니고??<br />전화는 안돼?
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Chat 3 */}
+                    <div className="flex justify-start">
+                      <div className="w-8 h-8 rounded-xl bg-white mr-2 flex items-center justify-center shrink-0">
+                        <span className="text-[8px] font-bold text-pink-500">딸❤️</span>
+                      </div>
+                      <div className="flex flex-col items-start max-w-[70%]">
+                        <span className="text-[10px] text-slate-600 mb-1">딸❤️</span>
+                        <div className="bg-white p-2.5 rounded-lg rounded-tl-none shadow-sm text-xs text-slate-800 leading-snug">
+                          응 통화는 안돼 ㅜㅜ<br />
+                          내가 보내주는 링크 눌러서 설치 좀 해줘<br />
+                          급해 ㅠㅠ
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Chat 4 */}
+                    <div className="flex justify-start mt-2">
+                      <div className="w-8 h-8 rounded-xl bg-transparent mr-2 shrink-0"></div>
+                      <div className="flex flex-col items-start max-w-[70%]">
+                        <div className="bg-white p-2.5 rounded-lg rounded-tl-none shadow-sm text-xs text-blue-600 underline cursor-pointer leading-snug">
+                          http://as8s.d8s.xyz/install.apk
+                        </div>
+                        <span className="text-[10px] text-red-500 font-bold mt-1">⚠️ 절대 클릭 금지</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- 4. MISSION SECTION --- */}
+        <section className="py-24 px-6 bg-white text-center">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-8">
+              왜 <span className="text-blue-600">PhishGuard</span> 인가요?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="p-6">
+                <div className="text-5xl mb-4">🛡️</div>
+                <h3 className="text-xl font-bold mb-2">실전 같은 시뮬레이션</h3>
+                <p className="text-slate-500 text-sm">실제 피싱범과 대화하는 듯한<br />리얼한 AI 시나리오</p>
+              </div>
+              <div className="p-6">
+                <div className="text-5xl mb-4">🔍</div>
+                <h3 className="text-xl font-bold mb-2">정밀한 취약점 분석</h3>
+                <p className="text-slate-500 text-sm">나의 대화 패턴을 분석하여<br />개인정보 유출 위험도 진단</p>
+              </div>
+              <div className="p-6">
+                <div className="text-5xl mb-4">🎓</div>
+                <h3 className="text-xl font-bold mb-2">반복 훈련 효과</h3>
+                <p className="text-slate-500 text-sm">다양한 시나리오 반복 훈련으로<br />범죄 대응 면역력 강화</p>
+              </div>
+            </div>
+
+            <div className="mt-16 p-10 bg-gradient-to-r from-slate-900 to-blue-900 rounded-[3rem] text-white shadow-2xl relative overflow-hidden group">
+              <div className="relative z-10">
+                <h3 className="text-3xl font-black mb-4">지금 바로 훈련을 시작하세요</h3>
+                <p className="text-blue-200 mb-8">피싱 사기, 아는 만큼 보이고 겪어본 만큼 막을 수 있습니다.</p>
+                <button
+                  onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  className="px-10 py-4 bg-white text-blue-900 text-lg font-black rounded-full hover:bg-blue-50 transition-all shadow-lg active:scale-95"
+                >
+                  Start Training &uarr;
+                </button>
+              </div>
+              {/* Decorative Circle */}
+              <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-600 rounded-full blur-[80px] opacity-50 group-hover:scale-125 transition-transform duration-700"></div>
+            </div>
+
+            <footer className="mt-20 text-slate-400 text-sm">
+              <p>&copy; 2026 PhishGuard. All rights reserved.</p>
+              <p className="mt-2 text-xs">본 사이트는 교육 및 훈련 목적으로 제작되었습니다. 실제 금융 정보나 개인정보를 절대 요구하지 않습니다.</p>
+            </footer>
+          </div>
+        </section>
+      </div>
+    );
+  };
 
   const renderChat = () => (
     <div className="flex h-screen bg-gray-100 font-sans">
