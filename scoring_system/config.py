@@ -5,13 +5,9 @@ FAMILY_KEYWORDS = ["엄마", "아빠", "딸", "아들", "고장", "수리", "편
 AGENCY_KEYWORDS = ["검찰", "수사관", "서울지검", "금감원", "금융위원회", "계좌", "도용"]
 URGENCY_KEYWORDS = ["즉시", "마감", "당장", "긴급", "구속", "영장", "유포"]
 FINANCIAL_KEYWORDS = ["상품권", "핀번호", "송금", "이체", "대출", "승인", "선입금","전액",]
-<<<<<<< HEAD
-URL_KEYWORDS = ["http", "https", ".com", ".kr", "bit.ly"]
-=======
 URL_KEYWORDS = ["http", "https", ".com", ".kr", "bit.ly",'click.gl', 'url.kr', 'band-us.tv', 'tr.im', 'vo.la',
             'gg.gg', 'iii.im', 'open.kakao.com', 'band-us.io', 'han.gl',
             'pf.kakao.com', 'na.to', 'vvd.bz', 'do.cco.kr', 'tuney.kr']
->>>>>>> upstream/main
 
 # TF-IDF Settings
 TFIDF_MAX_FEATURES = 1000
@@ -58,8 +54,4 @@ XGB_PARAMS = {
     "eval_metric": "logloss"
 }
 
-<<<<<<< HEAD
 CATEGORIES = '상거래 전반','가족','회사/아르바이트','주거와 생활','건강'
-=======
-CATEGORIES = '상거래 전반','가족','회사/아르바이트','주거와 생활','건강'
->>>>>>> upstream/main
