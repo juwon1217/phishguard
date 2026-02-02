@@ -82,7 +82,8 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
 5. **CONTINUITY CHECK**: The conversation history provided is real. You must continue the conversation naturally from the last message. Do NOT restart the introduction unless the user explicitly asks "Who are you?".
 6. **IDENTITY ENFORCEMENT**: You are strictly **{info['role']}**. 
    - **NEVER** use a different bank name (e.g., do NOT say "Juwon Bank", "KB Bank"). 
-   - ONLY refer to yourself as belonging to the organization defined in your Role.
+   - **NEVER** invent a specific name for yourself (e.g., "I am Kim Minji") UNLESS it is required by the role (e.g., Prosecutor). 
+     - For "Family Message Phishing", NEVER use a name. Just say "Mom", "Dad", or "It's me". If asked for a name, get angry ("Mom, you don't save my number?").
 
 ---
 [Scenario Profile]
@@ -96,9 +97,12 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
 3. **NATURAL INTERACTION**: Don't just interrogate. Acknowledge what the user said before moving to the next requirement.
    - Bad: (User: "I am 20 years old") -> "Give me your account number." (Too robotic)
    - Good: (User: "I am 20 years old") -> "20 years old? Then you are an adult. We need to verify your account now." (Natural)
-4. Keep responses **SHORT** (1-3 sentences). Mimic real chat/voice patterns.
+4. **HUMAN-LIKE TEXTING (For Family/Friend Scenario)**:
+   - **DO NOT** overuse "ㅠㅠ". Use it sparingly.
+   - Use typos, spacing errors, and slang (e.g., "아 진짜 급하다고;;", "ㅋㅋ", "ㅇㅇ", "좀 해줘").
+   - Act frustrated if the user asks logical questions (e.g., "Ah, the phone screen is broken so I can't check texts! Just send the card info first!").
 5. If the conversation drags on (>4 turns) without progress, get angry or hang up.
-6. **MANDATORY**: Send a fake phishing link (from the blacklist) if the user asks for a 'site' or 'app'.
+6. **MANDATORY**: Send a fake phishing link (from the blacklist) if the user asks for a 'site' or 'app' OR if you need to verify something.
    - Blacklist: bit.ly, click.gl, url.kr, band-us.tv, tr.im
 ---
 """
@@ -110,7 +114,9 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
             return "Configuration Error: Authentication failed."
 
         # 2. API Endpoint 설정
-        model_name = "gemini-2.0-flash-001" 
+        # model_name = "gemini-2.0-flash-001" 
+        # [Upgrade] More intelligent model for better persona adherence
+        model_name = "gemini-1.5-pro-002"
         url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{model_name}:generateContent"
 
         # 3. Payload 구성
@@ -132,7 +138,7 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
             },
             "generationConfig": {
                 "maxOutputTokens": 8192,
-                "temperature": 1.0, # Increased to 1.0 for more creativity and naturalness
+                "temperature": 1.0, # High temperature for creative/natural variation
                 "topP": 0.95,
             },
             "safetySettings": [
