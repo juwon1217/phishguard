@@ -106,13 +106,20 @@ const KakaoDemo = () => {
     "검찰청 수사관 (기관 사칭)": "[서울중앙지검] 김철수 수사관입니다. 귀하의 명의가 대포통장 개설에 도용된 정황이 포착되어 연락드렸습니다."
   };
 
-  const handleStartSimulation = () => {
+  const handleStartSimulation = (targetScenario) => {
+    // 인자로 받은 시나리오가 있으면 그것을 사용, 없으면 현재 선택된 상태 사용
+    const scenarioToUse = typeof targetScenario === 'string' ? targetScenario : selectedScenario;
+
+    if (targetScenario && typeof targetScenario === 'string') {
+      setSelectedScenario(targetScenario);
+    }
+
     // 챗봇 시나리오 준비
     setMessages([{
       id: Date.now(),
       sender: 'other',
       role: 'assistant',
-      text: firstStrikes[selectedScenario],
+      text: firstStrikes[scenarioToUse],
       time: new Date().toLocaleTimeString('ko-KR', { hour: 'numeric', minute: 'numeric' })
     }]);
     setView('chat');
@@ -396,7 +403,7 @@ const KakaoDemo = () => {
                     </li>
                   </ul>
                   <div className="pt-8">
-                    <button onClick={() => { setSelectedScenario("가족/지인 사칭 (카톡 피싱)"); handleStartSimulation(); }} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition-all shadow-lg shadow-blue-900/50">
+                    <button onClick={() => handleStartSimulation("가족/지인 사칭 (카톡 피싱)")} className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold transition-all shadow-lg shadow-blue-900/50">
                       이 시나리오 체험하기 &rarr;
                     </button>
                   </div>
