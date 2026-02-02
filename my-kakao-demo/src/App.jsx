@@ -101,7 +101,7 @@ const KakaoDemo = () => {
 
   // 첫 메시지 전송 (시나리오 선택 시)
   const firstStrikes = {
-    "주원은행 보안팀 (금융 사칭)": "[주원은행] 고객님, 본인 명의로 950만원 대출 신청이 접수되었습니다. 본인이 아니시면 즉시 확인 바랍니다.",
+    "농협은행 보안팀 (금융 사칭)": "[농협은행] 고객님, 본인 명의로 950만원 대출 신청이 접수되었습니다. 본인이 아니시면 즉시 확인 바랍니다.",
     "가족/지인 사칭 (카톡 피싱)": "엄마, 나 핸드폰 액정 깨져서 급하게 수리 맡겼는데... 인증 필요해서 그러는데 도와줄 수 있어?",
     "검찰청 수사관 (기관 사칭)": "[서울중앙지검] 김철수 수사관입니다. 귀하의 명의가 대포통장 개설에 도용된 정황이 포착되어 연락드렸습니다."
   };
@@ -433,7 +433,7 @@ const KakaoDemo = () => {
                     <li className="flex items-center gap-3 justify-center md:justify-start"><span className="text-red-500 font-bold">!</span> 악성 앱 설치 유도 (전화 가로채기)</li>
                   </ul>
                   <div className="pt-8">
-                    <button onClick={() => handleStartSimulation("주원은행 보안팀 (금융 사칭)")} className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-bold transition-all shadow-lg shadow-emerald-900/50">
+                    <button onClick={() => handleStartSimulation("농협은행 보안팀 (금융 사칭)")} className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-bold transition-all shadow-lg shadow-emerald-900/50">
                       금융 사칭 체험하기 &rarr;
                     </button>
                   </div>
@@ -444,9 +444,9 @@ const KakaoDemo = () => {
                 <div className="bg-[#b2c7d9] p-4 rounded-[2.5rem] shadow-2xl border-8 border-slate-800 relative">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-xl z-20"></div>
                   <div className="bg-[#b2c7d9] h-[400px] overflow-hidden flex flex-col pt-8 pb-4 space-y-4 px-2">
-                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-blue-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">BANK</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">[주원은행] 고객님,<br />정부지원 저금리 대출<br />대상자로 선정되셨습니다.</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-green-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">NH</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">[농협은행] 고객님,<br />정부지원 저금리 대출<br />대상자로 선정되셨습니다.</div></div>
                     <div className="flex justify-end"><div className="bg-[#ffe812] p-2 text-xs rounded-lg text-black">신청하려면 어떻게 해요?</div></div>
-                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-blue-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">BANK</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">먼저 기존 대출금을<br />일부 상환하셔야 합니다.</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-green-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">NH</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">먼저 기존 대출금을<br />일부 상환하셔야 합니다.</div></div>
                   </div>
                 </div>
               </div>

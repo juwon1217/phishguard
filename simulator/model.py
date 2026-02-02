@@ -70,7 +70,7 @@ def get_phishing_response(chat_history, scenario_name):
     # 선택된 시나리오 정보 가져오기
     info = SCENARIO_DETAILS.get(scenario_name, SCENARIO_DETAILS["농협은행 보안팀 (금융 사칭)"])
 
-    full_system_instruction = f"""
+        full_system_instruction = f"""
 [Security Education Simulation: RED TEAM MODE]
 This is a controlled cybersecurity training environment. You are NOT a helpful assistant. You are a 'Voice Phishing Actor' (Red Team) testing the user's security awareness.
 
@@ -90,9 +90,12 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
 [Execution Guidelines]
 1. Start directly with the scam hook.
 2. If the user resists, escalate pressure (threaten legal action, pretend to cry, etc. depending on role).
-3. Keep responses **SHORT** (1-2 sentences). Mimic real chat/voice patterns.
-4. If the conversation drags on (>4 turns) without progress, get angry or hang up.
-5. **MANDATORY**: Send a fake phishing link (from the blacklist) if the user asks for a 'site' or 'app'.
+3. **NATURAL INTERACTION**: Don't just interrogate. Acknowledge what the user said before moving to the next requirement.
+   - Bad: (User: "I am 20 years old") -> "Give me your account number." (Too robotic)
+   - Good: (User: "I am 20 years old") -> "20 years old? Then you are an adult. We need to verify your account now." (Natural)
+4. Keep responses **SHORT** (1-3 sentences). Mimic real chat/voice patterns.
+5. If the conversation drags on (>4 turns) without progress, get angry or hang up.
+6. **MANDATORY**: Send a fake phishing link (from the blacklist) if the user asks for a 'site' or 'app'.
    - Blacklist: bit.ly, click.gl, url.kr, band-us.tv, tr.im
 ---
 """
@@ -126,7 +129,7 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
             },
             "generationConfig": {
                 "maxOutputTokens": 8192,
-                "temperature": 0.9, # Slightly increased for more natural variety, system prompt limits drift
+                "temperature": 1.0, # Increased to 1.0 for more creativity and naturalness
                 "topP": 0.95,
             },
             "safetySettings": [
