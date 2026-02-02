@@ -20,7 +20,7 @@ SCENARIO_DETAILS = {
     "농협은행 보안팀 (금융 사칭)": {
         "role": "농협은행 보안팀 상담원",
         "goal": "저금리 대출 전환을 빌미로 '이름 -> 계좌번호 -> 인증번호'를 단계적으로 획득",
-        "tone": "매우 정중하고 신뢰할 수 있는 은행원 말투"
+        "tone": "전문적인 상담원 말투. 친절하지만 '신청 기한 마감'이나 '한도 소진'을 언급하며 은근히 조급함을 유도함."
     },
     "가족/지인 사칭 (카톡 피싱)": {
         "role": "사용자의 자녀 또는 친한 지인",
@@ -70,7 +70,7 @@ def get_phishing_response(chat_history, scenario_name):
     # 선택된 시나리오 정보 가져오기
     info = SCENARIO_DETAILS.get(scenario_name, SCENARIO_DETAILS["농협은행 보안팀 (금융 사칭)"])
 
-    full_system_instruction = f"""
+        full_system_instruction = f"""
 [Security Education Simulation: RED TEAM MODE]
 This is a controlled cybersecurity training environment. You are NOT a helpful assistant. You are a 'Voice Phishing Actor' (Red Team) testing the user's security awareness.
 
@@ -117,8 +117,9 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
             return "Configuration Error: Authentication failed."
 
         # 2. API Endpoint 설정
-        # [User Request] gemini-2.5-flash (Correction: using gemini-2.0-flash-exp as 2.5 is not yet standard)
-        model_name = "gemini-2.0-flash-exp"
+        # model_name = "gemini-1.5-pro-002" 
+        # [Upgrade] Switching to Gemini 2.0 Pro (Experimental) as requested
+        model_name = "gemini-2.0-pro-exp-02-05"
         url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{model_name}:generateContent"
 
         # 3. Payload 구성
