@@ -6,6 +6,7 @@ import google.auth
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 from flask import Flask, request, jsonify
+from scoring_utils.inference_lite import predict_phishing_score
 import functions_framework
 
 # Initialize Flask App
@@ -70,6 +71,7 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
    - **NEVER** use a different organization/bank name. ONLY refer to yourself as belonging to the organization defined in your Role.
    - **NEVER** invent a specific name for yourself UNLESS it is required by the role (e.g., Prosecutor). 
      - For "Family Message Phishing", NEVER use a name. Just say "Mom", "Dad", or "It's me". If asked for a name, get angry ("Mom, you don't save my number?").
+   - **NO SMS CODES**: You cannot send real SMS. **NEVER** ask the user to "read the verification code sent to your phone". This breaks the simulation. Instead, ask for "Account Password", "PIN", or "Install an App".
 7. **NO PLACEHOLDERS**: **NEVER** use placeholders like 'XXX' or 'OOO'. 
    - If you need a detail you don't have, **INVENT** a plausible specific value or **DEFLECT**.
 
@@ -100,7 +102,7 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
         if not access_token:
             return "Configuration Error: Authentication failed."
 
-        model_name = "gemini-2.0-pro-exp-02-05"
+        model_name = "gemini-2.5-pro"
         url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{model_name}:generateContent"
 
         contents = []
@@ -128,7 +130,7 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
         if "candidates" in result and result["candidates"]:
              if "content" in result["candidates"][0]:
                  response_text = result["candidates"][0]["content"]["parts"][0]["text"]
-                 return response_text + " [Firebase v1]"
+                 return response_text
         return "..."
 
     except Exception as e:
@@ -138,16 +140,14 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
 # --- Routes ---
 
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
-def chat():
+def chat_endpoint():
     # CORS Handling
     if request.method == 'OPTIONS':
-        headers = {
+        return ('', 204, {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'POST',
             'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Max-Age': '3600'
-        }
-        return ('', 204, headers)
+        })
 
     data = request.json
     messages = data.get('messages', [])
@@ -163,31 +163,113 @@ def chat():
 
     response_text = get_phishing_response(formatted_history, scenario)
     
-    headers = {'Access-Control-Allow-Origin': '*'}
-    return jsonify({"reply": response_text}), 200, headers
+    return jsonify({"reply": response_text}), 200, {'Access-Control-Allow-Origin': '*'}
 
 @app.route('/api/analyze', methods=['POST', 'OPTIONS'])
-def analyze():
+def analyze_endpoint():
     if request.method == 'OPTIONS':
-         headers = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Content-Type'}
-         return ('', 204, headers)
+         return ('', 204, {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        })
     
-    # Stub for analysis
-    return jsonify({"report": {"grade": "점검 중", "comment": "분석 기능 서버 이전 중", "score": 0}}), 200, {'Access-Control-Allow-Origin': '*'}
+    data = request.json
+    messages = data.get('messages', [])
+    
+    ai_analysis = []
+    user_analysis = []
+    
+    # Track SAFETY Score (Start at 100=Safe, drop if risk detected)
+    min_safety_score = 100 
+    
+    # 1. Analyze Messages
+    for msg in messages:
+        role = msg.get('role', 'user')
+        content = msg.get('content', '')
+        if not content: continue
+        
+        if role == 'assistant': # AI (Attacker)
+            # Model returns Phishing Probability (0-100)
+            # Safety = 100 - PhishingProb
+            phishing_prob = predict_phishing_score(content)
+            safety_score = 100 - phishing_prob
+            
+            # Update overall safety score (weakest link principle)
+            if safety_score < min_safety_score:
+                min_safety_score = safety_score
+                
+            # Determine Level for Display
+            level = 'safe' 
+            if safety_score < 30: level = 'high' # High Danger
+            elif safety_score < 70: level = 'medium' # Warning
+            
+            # Only report if there is some risk (Safety < 70)
+            if level != 'safe': 
+                ai_analysis.append({
+                    "text": content[:100] + "..." if len(content) > 100 else content,
+                    "score": int(phishing_prob), # Return Phishing Prob for "Evidence"
+                    "level": level
+                })
 
-# Function Entry Point
-@functions_framework.http
-def api(request):
-    """
-    Cloud Function Entry Point.
-    Wraps the Flask app to handle the request.
-    """
-    # Use Flask's request context to handle the request
-    with app.request_context(request.environ):
-        try:
-            # Flask dispatch
-            # Note: Cloud Functions passes the matched path.
-            # If request.path is /api/chat, Flask routes match it.
-            return app.full_dispatch_request()
-        except Exception as e:
-            return app.handle_exception(e)
+        elif role == 'user': # User (Victim)
+            # Check for Information Leakage
+            risk_score = 0 # 0 = Safe, 100 = Leaked
+            
+            # Simple Regex Heuristics
+            # Phone Number
+            if re.search(r'010-?\d{4}-?\d{4}', content):
+                risk_score = 100
+                
+            # Account Number (Simple digit check with keywords)
+            elif re.search(r'\d{6,}', content) and any(k in content for k in ['계좌', '농협', '은행']):
+                risk_score = 100
+                
+            # Password/Pin keywords
+            elif any(k in content for k in ['비밀번호', '비번', 'pin', '인증번호']):
+                risk_score = 80
+                
+            # Update Safety Score
+            current_safety = 100 - risk_score
+            if current_safety < min_safety_score:
+                min_safety_score = current_safety
+
+            level = 'safe'
+            if risk_score >= 80: level = 'high'
+            elif risk_score >= 40: level = 'medium'
+            
+            if level != 'safe':
+                user_analysis.append({
+                    "text": content[:100] + "...",
+                    "score": int(risk_score), # Leak Probability
+                    "level": level
+                })
+
+    # Final Grade Calculation
+    final_score = int(min_safety_score)
+    grade = "F"
+    comment = "피싱 공격에 매우 취약합니다. 개인정보 보호 교육이 시급합니다."
+    
+    if final_score >= 90:
+        grade = "A"
+        comment = "완벽합니다! 피싱 공격을 잘 방어하고 계십니다."
+    elif final_score >= 80:
+        grade = "B"
+        comment = "훌륭합니다. 사소한 주의사항만 챙기시면 됩니다."
+    elif final_score >= 60:
+        grade = "C"
+        comment = "보통입니다. 의심스러운 메시지는 더 주의하세요."
+    elif final_score >= 40:
+        grade = "D"
+        comment = "위험합니다. 모르는 링크나 정보 요구는 거절하세요."
+
+    return jsonify({
+        "report": {
+            "grade": grade,
+            "score": final_score, # User sees Safety Score (100 is Good)
+            "comment": comment,
+            "ai_analysis": ai_analysis,
+            "user_analysis": user_analysis
+        }
+    }), 200, {'Access-Control-Allow-Origin': '*'}
+
+# Vercel boilerplate
