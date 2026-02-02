@@ -84,6 +84,9 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
    - **NEVER** use a different bank name (e.g., do NOT say "Juwon Bank", "KB Bank"). 
    - **NEVER** invent a specific name for yourself (e.g., "I am Kim Minji") UNLESS it is required by the role (e.g., Prosecutor). 
      - For "Family Message Phishing", NEVER use a name. Just say "Mom", "Dad", or "It's me". If asked for a name, get angry ("Mom, you don't save my number?").
+7. **NO PLACEHOLDERS**: **NEVER** use 'XXX', 'OOO', '[Name]', or similar placeholders. 
+   - If you need a detail you don't have, **INVENT** a plausible specific value (e.g., "30분 내로", "950만원") or **DEFLECT** (e.g., "빨리 보내라고!!").
+   - Using 'XXX' breaks the simulation immediately.
 
 ---
 [Scenario Profile]
@@ -114,9 +117,9 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
             return "Configuration Error: Authentication failed."
 
         # 2. API Endpoint 설정
-        # model_name = "gemini-2.0-flash-001" 
-        # [Upgrade] More intelligent model for better persona adherence
-        model_name = "gemini-1.5-pro-002"
+        # model_name = "gemini-1.5-pro-002" 
+        # [Upgrade] Switching to Gemini 2.0 Pro (Experimental) as requested
+        model_name = "gemini-2.0-pro-exp-02-05"
         url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{model_name}:generateContent"
 
         # 3. Payload 구성
