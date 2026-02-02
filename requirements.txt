@@ -1,4 +1,4 @@
-# Force Rebuild: v4
+# Force Rebuild: v5 (Lightweight)
 fastapi
 uvicorn
 requests
@@ -6,10 +6,10 @@ google-auth
 google-auth-oauthlib
 google-auth-httplib2
 python-dotenv
-scikit-learn
-xgboost
-pandas
-scipy
+# scikit-learn
+# xgboost
+# pandas
+# scipy
 uvicorn
 pydantic
 python-dotenv
