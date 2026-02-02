@@ -130,7 +130,6 @@ const KakaoDemo = () => {
     setIsLoading(true);
 
     try {
-<<<<<<< HEAD
       const response = await fetch(`${apiBaseUrl}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -138,15 +137,6 @@ const KakaoDemo = () => {
           messages: newMessages.map(m => ({
             role: m.role || (m.sender === 'me' ? 'user' : 'assistant'),
             content: m.text
-=======
-      const response = await fetch('http://localhost:8000/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: newMessages.map(m => ({
-            role: m.role || (m.sender === 'me' ? 'user' : 'assistant'),
-            content: m.text
->>>>>>> upstream/main
           })),
           scenario: selectedScenario
         }),
@@ -715,7 +705,7 @@ const renderReport = () => {
               }`}>
               <div className="flex justify-between items-center mb-2">
                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${m.level === 'high' ? 'bg-rose-50 text-rose-600' :
-                    m.level === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
+                  m.level === 'medium' ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-500'
                   }`}>
 >>>>>>> upstream/main
                   {m.level === 'high' ? 'DANGER' : m.level === 'medium' ? 'WARNING' : 'SAFE'}
