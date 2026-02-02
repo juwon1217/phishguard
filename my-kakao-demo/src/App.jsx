@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import scamImage1 from './assets/scam1.jpg';
-import scamImage2 from './assets/scam2.jpg';
-
 // 1. 시나리오 및 프로필 설정 정보
 const SCENARIO_PROFILES = {
   "농협은행 보안팀 (금융 사칭)": {
@@ -697,7 +694,7 @@ const KakaoDemo = () => {
                 <h3 className="text-base font-black text-slate-800">피싱 공격 패턴 분석</h3>
               </div>
               <div className="space-y-4">
-                {data.ai_analysis.map((m, i) => renderSentenceCard(m, 'ai'))}
+                {data.ai_analysis.map((m) => renderSentenceCard(m, 'ai'))}
               </div>
             </div>
 
@@ -708,7 +705,7 @@ const KakaoDemo = () => {
                 <h3 className="text-base font-black text-slate-800">개인정보 노출 여부 분석</h3>
               </div>
               <div className="space-y-4">
-                {data.user_analysis.map((m, i) => renderSentenceCard(m, 'user'))}
+                {data.user_analysis.map((m) => renderSentenceCard(m, 'user'))}
               </div>
             </div>
           </div>
