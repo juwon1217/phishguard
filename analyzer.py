@@ -38,9 +38,10 @@ def analyze_phishing_chat(messages, scenario):
     # 피싱일 확률(0~1) 산출 (공격자의 정교함 측정)
     prob = float(model.predict_proba(X_final)[0][1])
     
-    # [추가] 사용자의 실제 정보 유출 가중치 계산 (Leakage Penalty)
-    # 숫자가 4개 이상 연속되면 계좌/비번 유출로 간주하여 강하게 감점합니다.
-    has_numbers = 1 if re.search(r'\d{4,}', full_text) else 0
+    # [수정] 단순 4자리(연도 등)는 제외하고, 전화번호(010...)나 6자리 이상(계좌/카드)만 감지
+    # 패턴설명: (01로 시작하는 폰번호) OR (하이픈 포함된 계좌형태) OR (6자리 이상 연속 숫자)
+    sensitive_pattern = r'(01[0-9][\s-]?\d{3,4}[\s-]?\d{4})|(\d{3,}-\d{2,}-\d{3,})|(\d{6,})'
+    has_numbers = 1 if re.search(sensitive_pattern, full_text) else 0
     leakage_penalty = (
         manual_feat_dict['financial_score'] * 20 + 
         manual_feat_dict['agency_score'] * 15 +

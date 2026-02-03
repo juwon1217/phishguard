@@ -1,4 +1,4 @@
-from scoring_system.config import (
+from config import (
     FAMILY_KEYWORDS, AGENCY_KEYWORDS, URGENCY_KEYWORDS,
     FINANCIAL_KEYWORDS, URL_KEYWORDS
 )
