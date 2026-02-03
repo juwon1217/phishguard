@@ -94,7 +94,7 @@ PhishGuard의 채점 시스템은 사용자의 억울함을 방지하고 실력�
 
 ## 📝 라이선스
 
-이 프로젝트는 **DACON 2026 Security AI Hackathon** 출품작으로 개발되었습니다.
+이 프로젝트는 **DACON : 피싱·스캠 예방을 위한 서비스 개발 경진대회** 출품작으로 개발되었습니다.
 MIT License에 따라 자유롭게 수정 및 배포가 가능합니다.
 
-> *Developed by Team MadScientist / Juwon*
+> *Developed by Team 강태공*
