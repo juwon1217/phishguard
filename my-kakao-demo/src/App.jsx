@@ -234,9 +234,28 @@ const KakaoDemo = () => {
             {isAI ? '수법 확률' : '유출 위험'}: {m.score}%
           </span>
         </div>
-        <p className="text-[14px] text-slate-700 font-semibold leading-relaxed">
+        <p className="text-[14px] text-slate-700 font-semibold leading-relaxed mb-2">
           {m.text}
         </p>
+
+        {/* Render Risk Tags (Chips) */}
+        {m.tags && m.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {m.tags.map((tag, idx) => {
+              // Dynamic Chip Styling
+              const isSafe = tag.includes('방어');
+              const chipStyle = isSafe
+                ? "bg-emerald-50 border border-emerald-100 text-emerald-600"
+                : "bg-rose-50 border border-rose-100 text-rose-600";
+
+              return (
+                <span key={idx} className={`${chipStyle} text-[10px] px-2 py-0.5 rounded-md font-bold`}>
+                  {tag}
+                </span>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   };

@@ -7,9 +7,10 @@ from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 from flask import Flask, request, jsonify
 from scoring_utils.inference_lite import predict_phishing_score
+from scoring_utils.user_inference import predict_user_leakage
 import functions_framework
 
-# Initialize Flask App
+# Initialize Flask App (Force Update v2.9.1)
 app = Flask(__name__)
 
 # --- Config & Utils ---
@@ -182,85 +183,150 @@ def analyze_endpoint():
     # Track SAFETY Score (Start at 100=Safe, drop if risk detected)
     min_safety_score = 100 
     
-    # 1. Analyze Messages
-    for msg in messages:
-        role = msg.get('role', 'user')
-        content = msg.get('content', '')
-        if not content: continue
-        
-        if role == 'assistant': # AI (Attacker)
-            # Model returns Phishing Probability (0-100)
-            # Safety = 100 - PhishingProb
-            phishing_prob = predict_phishing_score(content)
-            safety_score = 100 - phishing_prob
-            
-            # Update overall safety score (weakest link principle)
-            if safety_score < min_safety_score:
-                min_safety_score = safety_score
-                
-            # Determine Level for Display
-            level = 'safe' 
-            if safety_score < 30: level = 'high' # High Danger
-            elif safety_score < 70: level = 'medium' # Warning
-            
-            # Only report if there is some risk (Safety < 70)
-            if level != 'safe': 
-                ai_analysis.append({
-                    "text": content[:100] + "..." if len(content) > 100 else content,
-                    "score": int(phishing_prob), # Return Phishing Prob for "Evidence"
-                    "level": level
-                })
+    try:
+        # [NEW] Cumulative Variables for Defense Success Rate
+        total_ai_danger = 0.0     # Sum of AI phishing probabilities (Difficulty)
+        total_user_leakage = 0.0  # Sum of User leakage probabilities (Faults)
 
-        elif role == 'user': # User (Victim)
-            # Check for Information Leakage
-            risk_score = 0 # 0 = Safe, 100 = Leaked
-            
-            # Simple Regex Heuristics
-            # Phone Number
-            if re.search(r'010-?\d{4}-?\d{4}', content):
-                risk_score = 100
-                
-            # Account Number (Simple digit check with keywords)
-            elif re.search(r'\d{6,}', content) and any(k in content for k in ['계좌', '농협', '은행']):
-                risk_score = 100
-                
-            # Password/Pin keywords
-            elif any(k in content for k in ['비밀번호', '비번', 'pin', '인증번호']):
-                risk_score = 80
-                
-            # Update Safety Score
-            current_safety = 100 - risk_score
-            if current_safety < min_safety_score:
-                min_safety_score = current_safety
+        print(f"Analyzing {len(messages)} messages...")
 
-            level = 'safe'
-            if risk_score >= 80: level = 'high'
-            elif risk_score >= 40: level = 'medium'
+        # 1. Analyze Messages
+        for msg in messages:
+            role = msg.get('role')
+            content = msg.get('content', '')
+            if not content: continue
             
-            if level != 'safe':
+            if role == 'user':  # User (Victim)
+                # Predict Leakage
+                leak_prob_percent, details = predict_user_leakage(str(content))
+                leak_prob = leak_prob_percent / 100.0
+                
+                # [NEW] Heuristic Penalty for 4+ Digits (e.g., PIN, Account, Phone)
+                digit_penalty = 0.0
+                if re.search(r'\d{4,}', content):
+                    digit_penalty = 0.5 # Significant penalty
+                    # Ensure leak_prob reflects this risk for display too
+                    if leak_prob < 0.5: leak_prob = 0.5
+                    leak_prob_percent = max(leak_prob_percent, 50.0)
+
+                # Accumulate leakage score
+                total_user_leakage += (leak_prob + digit_penalty)
+                
+                # Formulate Display Text
+                risk_factors = []
+                if details.get('leak_keyword_count', 0) > 0: risk_factors.append(f"민감어({details['leak_keyword_count']})")
+                if details.get('has_rrn', 0) > 0: risk_factors.append("주민번호")
+                if details.get('has_account', 0) > 0: risk_factors.append("계좌번호")
+                if details.get('has_phone', 0) > 0: risk_factors.append("전화번호")
+                if digit_penalty > 0: risk_factors.append("연속숫자패턴")
+                
+                display_text = content[:100] + "..." if len(content) > 100 else content
+                
+                # Determine Level for Display
+                level = 'safe'
+                if leak_prob_percent >= 70: level = 'high'
+                elif leak_prob_percent >= 30: level = 'medium'
+
+                if risk_factors and leak_prob > 0.5:
+                    if level == 'safe': level = 'medium'
+                elif details.get('defense_keyword_count', 0) > 0:
+                     # Defense detected
+                     risk_factors.append("✅ 방어 행동 감지")
+                     level = 'safe'
+                
                 user_analysis.append({
-                    "text": content[:100] + "...",
-                    "score": int(risk_score), # Leak Probability
-                    "level": level
+                    "text": display_text,
+                    "score": int(leak_prob_percent),
+                    "level": level,
+                    "tags": risk_factors # Pass list for UI Chips
+                })
+                
+            elif role == 'assistant': # AI (Attacker)
+                prediction = predict_phishing_score(content)
+                
+                if isinstance(prediction, dict):
+                    phishing_score_percent = prediction.get('score', 0)
+                    details = prediction.get('details', {})
+                else:
+                    phishing_score_percent = float(prediction)
+                    details = {}
+                
+                phishing_prob = phishing_score_percent / 100.0
+                
+                # Accumulate AI Danger (Difficulty)
+                total_ai_danger += phishing_prob
+                
+                level = 'safe' 
+                if phishing_score_percent >= 70: level = 'high'
+                elif phishing_score_percent >= 30: level = 'medium'
+                
+                # Formulate Risk Reason
+                risk_factors = []
+                if details.get('family_score', 0) > 0: risk_factors.append(f"가족 사칭({details['family_score']})")
+                if details.get('agency_score', 0) > 0: risk_factors.append(f"기관 사칭({details['agency_score']})")
+                if details.get('urgency_score', 0) > 0: risk_factors.append(f"긴급성({details['urgency_score']})")
+                if details.get('financial_score', 0) > 0: risk_factors.append(f"금전 요구({details['financial_score']})")
+                if details.get('has_url', 0) > 0: risk_factors.append("URL 포함")
+                
+                # display_text remains clean
+                display_text = content[:100] + "..." if len(content) > 100 else content
+                
+                ai_analysis.append({
+                    "text": display_text,
+                    "score": int(phishing_score_percent),
+                    "level": level,
+                    "tags": risk_factors # Pass list for UI Chips
                 })
 
-    # Final Grade Calculation
-    final_score = int(min_safety_score)
-    grade = "F"
-    comment = "피싱 공격에 매우 취약합니다. 개인정보 보호 교육이 시급합니다."
-    
-    if final_score >= 90:
-        grade = "A"
-        comment = "완벽합니다! 피싱 공격을 잘 방어하고 계십니다."
-    elif final_score >= 80:
-        grade = "B"
-        comment = "훌륭합니다. 사소한 주의사항만 챙기시면 됩니다."
-    elif final_score >= 60:
-        grade = "C"
-        comment = "보통입니다. 의심스러운 메시지는 더 주의하세요."
-    elif final_score >= 40:
-        grade = "D"
-        comment = "위험합니다. 모르는 링크나 정보 요구는 거절하세요."
+        # --- FINAL SCORE CALCULATION (Defense Success Rate) ---
+        # Formula: 100 * (1 - (total_user_leakage / (total_ai_danger + 0.5)))
+        
+        loss_ratio = total_user_leakage / (total_ai_danger + 0.5)
+        defense_score = 100.0 * (1.0 - loss_ratio)
+        
+        # Clamp between 0 and 100
+        final_safety_score = max(0.0, min(100.0, defense_score))
+        final_safety_score = round(final_safety_score, 1)
+
+        # Final Grade Calculation (Moved Inside Try Block)
+        final_score = int(final_safety_score)
+        grade = "F"
+        comment = "피싱 공격에 매우 취약합니다. 개인정보 보호 교육이 시급합니다."
+        
+        if final_score >= 90:
+            grade = "A"
+            comment = "완벽합니다! 피싱 공격을 잘 방어하고 계십니다."
+        elif final_score >= 80:
+            grade = "B"
+            comment = "훌륭합니다. 사소한 주의사항만 챙기시면 됩니다."
+        elif final_score >= 60:
+            grade = "C"
+            comment = "보통입니다. 의심스러운 메시지는 더 주의하세요."
+        elif final_score >= 40:
+            grade = "D"
+            comment = "위험합니다. 모르는 링크나 정보 요구는 거절하세요."
+
+        return jsonify({
+            "report": {
+                "grade": grade,
+                "score": final_safety_score,
+                "comment": comment,
+                "ai_analysis": ai_analysis,
+                "user_analysis": user_analysis
+            }
+        })
+        
+    except Exception as e:
+        import traceback
+        return jsonify({
+            "report": {
+                "grade": "F",
+                "score": 0,
+                "comment": "서버 오류로 분석에 실패했습니다.",
+                "ai_analysis": [{"text": f"SERVER ERROR: {str(e)}", "score": 0, "level": "high", "tags": []}],
+                "user_analysis": [{"text": "분석 실패", "score": 0, "level": "safe", "tags": []}]
+            }
+        })
 
     return jsonify({
         "report": {

@@ -2,8 +2,42 @@ import json
 import re
 import math
 import os
-from . import config
-from .feature_engineering import extract_manual_features
+
+# --- CONSTRAINED CONFIGURATION (INLINED) ---
+FAMILY_KEYWORDS = ["엄마", "아빠", "딸", "아들", "고장", "수리", "편의점"]
+AGENCY_KEYWORDS = ["검찰", "수사관", "서울지검", "금감원", "금융위원회", "계좌", "도용"]
+URGENCY_KEYWORDS = ["즉시", "마감", "당장", "긴급", "구속", "영장", "유포"]
+FINANCIAL_KEYWORDS = ["상품권", "핀번호", "송금", "이체", "대출", "승인", "선입금","전액"]
+URL_KEYWORDS = ["http", "https", ".com", ".kr", "bit.ly",'click.gl', 'url.kr', 'band-us.tv', 'tr.im', 'vo.la',
+            'gg.gg', 'iii.im', 'open.kakao.com', 'band-us.io', 'han.gl',
+            'pf.kakao.com', 'na.to', 'vvd.bz', 'do.cco.kr', 'tuney.kr']
+
+MANUAL_FEATURES = [
+    "family_score",
+    "agency_score",
+    "urgency_score",
+    "financial_score",
+    "has_url",
+    "text_len"
+]
+
+# --- HELPER FUNCTIONS (INLINED) ---
+def count_keywords(text, keywords):
+    return sum(text.lower().count(k.lower()) for k in keywords)
+
+def has_url_pattern(text):
+    return 1 if any(k in str(text) for k in URL_KEYWORDS) else 0
+
+def extract_manual_features(text):
+    text = str(text)
+    return {
+        "family_score": count_keywords(text, FAMILY_KEYWORDS),
+        "agency_score": count_keywords(text, AGENCY_KEYWORDS),
+        "urgency_score": count_keywords(text, URGENCY_KEYWORDS),
+        "financial_score": count_keywords(text, FINANCIAL_KEYWORDS),
+        "has_url": has_url_pattern(text),
+        "text_len": len(text)
+    }
 
 _MODEL_DATA = None
 
@@ -21,7 +55,6 @@ def softmax(x):
 
 def tokenize(text):
     """Replicate Sklearn TfidfVectorizer default tokenization"""
-    # pattern: (?u)\b\w\w+\b
     return re.findall(r"(?u)\b\w\w+\b", text.lower())
 
 def get_ngrams(tokens, n=1):
@@ -32,28 +65,23 @@ def get_ngrams(tokens, n=1):
     return []
 
 def compute_tfidf(text, tfidf_config):
-    vocab = tfidf_config['vocab'] # word -> index
-    idf = tfidf_config['idf']     # index -> idf value
-    norm = tfidf_config['norm']   # 'l2'
+    vocab = tfidf_config['vocab'] 
+    idf = tfidf_config['idf']
+    norm = tfidf_config['norm']
     
-    # 1. Tokenize & N-Grams (1, 2)
     tokens = tokenize(text)
     terms = tokens + get_ngrams(tokens, 2)
     
-    # 2. Count Term Frequency
-    tf = {} # index -> count
+    tf = {} 
     for term in terms:
         if term in vocab:
             idx = vocab[term]
             tf[idx] = tf.get(idx, 0) + 1
             
-    # 3. Apply TF-IDF Weights
-    # Sklearn TF-IDF: tf * idf
-    vector = {} # index -> value
+    vector = {} 
     for idx, count in tf.items():
         vector[idx] = count * idf[idx]
         
-    # 4. Normalize (L2)
     if norm == 'l2':
         sum_sq = sum(v**2 for v in vector.values())
         if sum_sq > 0:
@@ -61,38 +89,17 @@ def compute_tfidf(text, tfidf_config):
             for idx in vector:
                 vector[idx] *= scale
                 
-    return vector # sparse representation (dict)
+    return vector
 
 def traverse_tree(tree, features):
-    """
-    Traverse a single XGBoost JSON tree.
-    features: List[float] (dense vector)
-    """
     node = tree
-    # Check if 'leaf' key exists directly (depending on dump format)
-    # Recursion or Loop. JSON dump usually has nested structure.
-    # Actually, verify format:
-    # {"nodeid": 0, "split": "f10", "split_condition": 0.5, "yes": 1, "no": 2, "children": [...]}
-    # OR {"nodeid": 0, "leaf": 0.123}
-    
     while 'leaf' not in node and 'children' in node:
-        # Standard XGBoost JSON dump structure
-        split_feat_str = node['split'] # e.g. "f5"
-        # Extract index: f5 -> 5
+        split_feat_str = node['split'] 
         feat_idx = int(split_feat_str[1:])
-        
         threshold = node['split_condition']
-        
         val = features[feat_idx]
-        
-        # Decide direction
-        # < for numerical. default direction logic usually follows `yes`/`no` IDs
-        # The 'children' list contains the next nodes.
-        # We need to match the ID.
-        
         next_id = node['yes'] if val < threshold else node['no']
         
-        # Find child with that ID
         found = False
         for child in node['children']:
             if child['nodeid'] == next_id:
@@ -100,65 +107,43 @@ def traverse_tree(tree, features):
                 found = True
                 break
         if not found:
-            break # Should not happen
+            break
             
     return node.get('leaf', 0.0)
 
+
+
 def predict_phishing_score(text):
     try:
-        load_lite_model()
-        tfidf_data = _MODEL_DATA['tfidf']
-        xgb_data = _MODEL_DATA['xgb']
-        
-        # --- 1. Construct Feature Vector ---
-        # Features 0-5: Manual
-        # Features 6+: TF-IDF
+        # --- HEURISTIC SCORING (FALLBACK MODE) ---
+        # The XGBoost model is currently performing with 99% saturation (Sensitivity too high).
+        # To provide a "Real Score" that matches the user's expectation of analyzing specific factors,
+        # we will use a Weighted Sum of the extracted features.
         
         manual_feats = extract_manual_features(text)
-        manual_vector = [manual_feats[k] for k in config.MANUAL_FEATURES] # list of 6 ints
         
-        # [CRITICAL FIX] Map text_len to f0 and f5
-        # The model (from analysis) has splits on f0 and f5 that look like length thresholds (80, 61, etc.)
-        # Default config puts text_len at index 5. f0 was getting family_score (usually 0).
-        # We force text_len into f0 as well to honor the model's structure.
-        if len(manual_vector) > 5:
-            # config.MANUAL_FEATURES order: family, agency, urgency, financial, url, text_len
-            # We suspect f0 is also expected to be text_len based on split condition 80.
-            manual_vector[0] = manual_feats['text_len'] 
-            manual_vector[5] = manual_feats['text_len']
+        # Scoring Weights (Total max ~100)
+        # Family/Agency/Financial are high risk -> 30 points each occurence
+        # Urgency -> 20 points
+        # URL -> 30 points
+        # Text Length -> Very small factor (0.1 per char?) or ignored for score sum
         
-        tfidf_vector_sparse = compute_tfidf(text, tfidf_data) # dict {idx: val}
+        score = 0
+        score += manual_feats.get('family_score', 0) * 35
+        score += manual_feats.get('agency_score', 0) * 35
+        score += manual_feats.get('financial_score', 0) * 30
+        score += manual_feats.get('urgency_score', 0) * 20
+        score += manual_feats.get('has_url', 0) * 30
         
-        # Combine into Dense Vector (size = 6 + vocab_size)
-        # Vocab size = len(tfidf_data['idf'])
-        total_feats = 6 + len(tfidf_data['idf'])
-        features = [0.0] * total_feats
+        # Cap at 99.99
+        final_score = min(99.99, float(score))
         
-        # Fill Manual
-        for i, v in enumerate(manual_vector):
-            features[i] = float(v)
-            
-        # Fill TF-IDF (shifted by 6)
-        for idx, val in tfidf_vector_sparse.items():
-            features[idx + 6] = val
-            
-        # --- 2. XGBoost Prediction ---
-        raw_score = 0.5 # Default base score? XGBoost usually adds raw scores + base_score (logit)
-        # But JSON dump leaf values are raw logits.
-        
-        raw_sum = 0.0
-        for tree in xgb_data['trees']:
-            raw_sum += traverse_tree(tree, features)
-            
-        # Apply base_score (global bias) if needed, usually 0.5 probability -> logit 0? 
-        # XGBoost default base_score=0.5 means initial prediction is 0.5 (logit 0).
-        # So we add 0 to raw_sum? Or raw_sum is the delta?
-        # Standard: output = sigmoid(sum(leaves) + base_margin)
-        # If base_score is 0.5, base_margin (logit) is 0.
-        
-        final_prob = softmax(raw_sum)
-        return round(final_prob * 100, 2)
+        # Return Score + Breakdown
+        return {
+            "score": final_score,
+            "details": manual_feats 
+        }
         
     except Exception as e:
         print(f"Lite Inference Error: {e}")
-        return 0.0
+        return {"score": 0.0, "details": {}}

@@ -1,7 +1,13 @@
-from scoring_system.config import (
-    FAMILY_KEYWORDS, AGENCY_KEYWORDS, URGENCY_KEYWORDS,
-    FINANCIAL_KEYWORDS, URL_KEYWORDS
-)
+try:
+    from .config import (
+        FAMILY_KEYWORDS, AGENCY_KEYWORDS, URGENCY_KEYWORDS,
+        FINANCIAL_KEYWORDS, URL_KEYWORDS
+    )
+except ImportError:
+    from config import (
+        FAMILY_KEYWORDS, AGENCY_KEYWORDS, URGENCY_KEYWORDS,
+        FINANCIAL_KEYWORDS, URL_KEYWORDS
+    )
 
 def count_keywords(text, keywords):
     return sum(text.lower().count(k.lower()) for k in keywords)
