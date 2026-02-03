@@ -86,7 +86,7 @@ PhishGuard의 채점 시스템은 사용자의 억울함을 방지하고 실력�
 ## 📢 배포 링크
 
 현재 Vercel을 통해 정식 배포되어 누구나 체험할 수 있습니다.
-👉 **[실전 체험 링크 바로가기](https://phishguard-final-clean-nshp9n7t8-juwon1217s-projects.vercel.app)**
+👉 **[실전 체험 링크 바로가기](https://phishguard-final-clean-i0ylwa5qw-juwon1217s-projects.vercel.app/)**
 
 *(참고: AI 기능은 유효한 Google Cloud API Key가 설정된 환경에서만 작동합니다.)*
 

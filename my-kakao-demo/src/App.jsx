@@ -267,80 +267,86 @@ const KakaoDemo = () => {
     return (
       <div className="min-h-screen bg-slate-50 font-sans text-slate-900 overflow-y-auto scroll-smooth">
 
-        {/* --- 1. HERO SECTION --- */}
-        <section className="relative min-h-screen flex flex-col items-center justify-center p-6 text-center overflow-hidden">
-          {/* Background Gradient Orbs */}
-          <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-            <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-blue-200/30 rounded-full blur-[120px] animate-pulse"></div>
-            <div className="absolute top-[40%] -right-[10%] w-[40%] h-[40%] bg-indigo-200/30 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+        {/* --- 1. HERO SECTION (Redesigned: Immersive & Full Screen) --- */}
+        <section className="relative h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-purple-50 via-white to-blue-50">
+
+          {/* Animated Background Orbs */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-purple-300/30 rounded-full blur-[120px] animate-pulse mix-blend-multiply"></div>
+            <div className="absolute bottom-[10%] right-[20%] w-[500px] h-[500px] bg-blue-300/30 rounded-full blur-[120px] animate-pulse delay-1000 mix-blend-multiply"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-100/40 rounded-full blur-[100px] -z-10"></div>
           </div>
 
-          <div className="relative z-10 bg-white/80 backdrop-blur-xl p-10 md:p-16 rounded-[3rem] shadow-2xl max-w-4xl w-full border border-white/50 ring-1 ring-slate-100/50">
-            <div className="flex flex-col items-center mb-10">
-              <div className="relative mb-8 group cursor-default">
-                <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full blur-lg opacity-30 group-hover:opacity-60 transition duration-500"></div>
-                <div className="relative bg-white p-6 rounded-full shadow-lg border border-blue-50">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16 text-blue-600">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                    <path d="m9 12 2 2 4-4" />
-                  </svg>
-                </div>
-              </div>
+          <div className="relative z-10 flex flex-col items-center max-w-5xl mx-auto px-6 text-center">
 
-              <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none mb-6">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">Phish</span>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Guard</span>
-              </h1>
-              <p className="text-xl md:text-2xl text-slate-500 font-medium tracking-tight mb-8">
-                대한민국 No.1 피싱범죄 대응 훈련 시뮬레이터
-              </p>
-
-              {/* --- 시나리오 선택 UI 추가 --- */}
-              <div className="flex flex-wrap gap-2 justify-center mb-8">
-                {scenarios.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => handleScenarioChange(s)}
-                    className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${selectedScenario === s
-                      ? 'bg-blue-600 text-white shadow-md scale-105'
-                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                      }`}
-                  >
-                    {s.split('(')[0]} {/* 괄호 앞부분만 노출 (깔끔하게) */}
-                  </button>
-                ))}
-              </div>
-
-              {/* Main Action Area */}
-              <div className="w-full max-w-md mx-auto space-y-6">
-                <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-200"></div>
-                  <button
-                    onClick={handleStartSimulation}
-                    className="relative w-full py-5 bg-[#f7e600] text-gray-900 text-xl font-black rounded-2xl hover:scale-[1.02] active:scale-95 transition-all duration-200 shadow-xl flex items-center justify-center gap-3"
-                  >
-                    <span>⚡ {selectedScenario.split(' ')[0]} 훈련 시작하기</span>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm font-bold text-slate-500">
-                    👮 경찰청 데이터 기반
-                  </div>
-                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm font-bold text-slate-500">
-                    🤖 AI 실시간 분석
-                  </div>
-                </div>
+            {/* Logo Icon with Glow */}
+            <div className="relative mb-8 group">
+              <div className="absolute -inset-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition duration-500 animate-pulse"></div>
+              <div className="relative bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-lg border border-white/50 ring-1 ring-blue-100/50">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-12 h-12 text-blue-600">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
               </div>
             </div>
 
-            {/* Scroll Indicator */}
-            <div
-              onClick={() => scrollToSection('info-section')}
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer animate-bounce text-slate-400 hover:text-blue-600 transition-colors"
-            >
-              <span className="text-xs font-bold uppercase tracking-widest">Learn More</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            {/* Main Title */}
+            <h1 className="text-7xl md:text-9xl font-black tracking-tighter leading-none mb-6 drop-shadow-sm">
+              <span className="bg-clip-text text-transparent bg-gradient-to-br from-slate-900 via-slate-700 to-slate-900">Phish</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-br from-blue-600 to-indigo-500">Guard</span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-slate-500 font-medium tracking-tight mb-12 max-w-2xl leading-relaxed">
+              대한민국 No.1 <span className="text-slate-800 font-bold">AI 피싱 대응 훈련 시뮬레이터</span><br />
+              <span className="text-base text-slate-400 font-normal">실시간 AI 분석으로 당신의 방어력을 증명하세요</span>
+            </p>
+
+            {/* Scenario Selection Pills */}
+            <div className="flex flex-wrap gap-3 justify-center mb-10">
+              {scenarios.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => handleScenarioChange(s)}
+                  className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border backdrop-blur-sm ${selectedScenario === s
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200 scale-105'
+                    : 'bg-white/60 text-slate-500 border-white hover:bg-white hover:border-blue-200 hover:text-blue-600'
+                    }`}
+                >
+                  {s.split('(')[0].replace('농협은행', '은행')}
+                </button>
+              ))}
+            </div>
+
+            {/* Main CTA Button */}
+            <div className="w-full max-w-md relative group mb-12">
+              <div className="absolute -inset-1 bg-gradient-to-r from-yellow-300 to-orange-400 rounded-2xl blur opacity-40 group-hover:opacity-75 transition duration-300"></div>
+              <button
+                onClick={handleStartSimulation}
+                className="relative w-full py-5 bg-[#f7e600] text-gray-900 text-xl font-black rounded-2xl hover:scale-[1.01] active:scale-95 transition-all duration-200 shadow-xl flex items-center justify-center gap-3"
+              >
+                <span>⚡ 훈련 시작하기</span>
+              </button>
+            </div>
+
+            {/* Info Chips */}
+            <div className="flex gap-4">
+              <div className="px-5 py-2 rounded-xl bg-white/60 backdrop-blur-md border border-white text-xs font-bold text-slate-500 shadow-sm flex items-center gap-2">
+                <span>👮</span> 경찰청 데이터 기반
+              </div>
+              <div className="px-5 py-2 rounded-xl bg-white/60 backdrop-blur-md border border-white text-xs font-bold text-slate-500 shadow-sm flex items-center gap-2">
+                <span>🤖</span> AI 실시간 분석
+              </div>
+            </div>
+          </div>
+
+          {/* Scroll Indicator (Positioned Absolute to Screen) */}
+          <div
+            onClick={() => scrollToSection('info-section')}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 cursor-pointer group z-20"
+          >
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 group-hover:text-blue-600 transition-colors">Start Learning</span>
+            <div className="w-10 h-10 rounded-full bg-white/80 backdrop-blur shadow-md flex items-center justify-center group-hover:scale-110 transition-transform duration-300 border border-slate-100 animate-bounce">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
               </svg>
             </div>
@@ -422,9 +428,9 @@ const KakaoDemo = () => {
                 <div className="bg-[#b2c7d9] p-4 rounded-[2.5rem] shadow-2xl border-8 border-slate-800 relative">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-xl z-20"></div>
                   <div className="bg-[#b2c7d9] h-[400px] overflow-hidden flex flex-col pt-8 pb-4 space-y-4 px-2">
-                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-white mr-2 flex items-center justify-center"><span className="text-[10px]">딸</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">엄마 폰 고장났어 ㅠㅠ<br />인증 좀 해줘</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-slate-200 mr-2 flex items-center justify-center"><span className="text-[10px] text-slate-700 font-bold">지인</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">엄마 폰 고장났어 ㅠㅠ<br />인증 좀 해줘</div></div>
                     <div className="flex justify-end"><div className="bg-[#ffe812] p-2 text-xs rounded-lg text-black">전화는 안돼?</div></div>
-                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-white mr-2 flex items-center justify-center"><span className="text-[10px]">딸</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">응 통화 안돼<br />급하니까 빨리..</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-slate-200 mr-2 flex items-center justify-center"><span className="text-[10px] text-slate-700 font-bold">지인</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">응 통화 안돼<br />급하니까 빨리..</div></div>
                   </div>
                 </div>
               </div>
@@ -460,9 +466,9 @@ const KakaoDemo = () => {
                 <div className="bg-[#b2c7d9] p-4 rounded-[2.5rem] shadow-2xl border-8 border-slate-800 relative">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-slate-800 rounded-b-xl z-20"></div>
                   <div className="bg-[#b2c7d9] h-[400px] overflow-hidden flex flex-col pt-8 pb-4 space-y-4 px-2">
-                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-green-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">NH</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">[농협은행] 고객님,<br />정부지원 저금리 대출<br />대상자로 선정되셨습니다.</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-green-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">Bank</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">[은행] 고객님,<br />정부지원 저금리 대출<br />대상자로 선정되셨습니다.</div></div>
                     <div className="flex justify-end"><div className="bg-[#ffe812] p-2 text-xs rounded-lg text-black">신청하려면 어떻게 해요?</div></div>
-                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-green-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">NH</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">먼저 기존 대출금을<br />일부 상환하셔야 합니다.</div></div>
+                    <div className="flex justify-start"><div className="w-8 h-8 rounded-xl bg-green-600 mr-2 flex items-center justify-center text-white"><span className="text-[8px]">Bank</span></div><div className="bg-white p-2 text-xs rounded-lg text-black">먼저 기존 대출금을<br />일부 상환하셔야 합니다.</div></div>
                   </div>
                 </div>
               </div>
@@ -733,7 +739,7 @@ const KakaoDemo = () => {
           <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-6">
               <div className="text-xs font-bold text-slate-400">
-                SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0]}</span>
+                SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0].replace('농협은행', '은행')}</span>
               </div>
               <div className="text-xs font-bold text-slate-400">
                 ENGINE: <span className="text-emerald-600 ml-1 font-black">PhishGuard v2.8</span>
