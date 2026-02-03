@@ -1,93 +1,102 @@
-PhishGuard: 피싱 및 스캔 예방 시뮬레이션 서비스
-보이스피싱 시나리오에 대응하며 보안 의식을 높이는 AI 기반 채팅 시뮬레이션 프로젝트입니다.
+# 🛡️ PhishGuard (AI-Powered Vishing Simulation Platform)
 
-# 🛠️ 기술 스택 (Tech Stack)
-Frontend: React, Tailwind CSS, Vite
+> **"Experience real-world voice phishing scenarios with AI Red Teams and analyze your leakage risks in real-time."**
 
-Backend: FastAPI (Python 3.13+), Uvicorn
+PhishGuard is an advanced cybersecurity training platform that uses Generative AI to simulate realistic voice phishing (vishing) attacks. Unlike traditional static quizzes, PhishGuard engages users in dynamic, open-ended conversations with an AI "Red Team" actor, analyzing their responses for sensitive information leakage.
 
-AI Engine: Google Gemini API (gemini-2.5-flash-lite 추천)
+![PhishGuard Overview](https://img.shields.io/badge/Version-v2.8-blue) ![License](https://img.shields.io/badge/License-MIT-green)
 
-Infrastructure: GitHub
+---
 
-# 📂 프로젝트 구조 (Project Structure)
-my-kakao-demo/: React 프론트엔드 소스 코드
+## 🚀 Key Features
 
-simulator/model.py: Gemini API 연동 및 AI 시뮬레이터 설정
+### 1. 🤖 Adaptive AI "Red Team"
+Powered by **Google Gemini 2.5 Pro**, the AI assumes specific personas (Banker, Family, Prosecutor) and adapts its attack strategy based on user responses. It uses psychological triggers like urgency, authority, and family emergencies to test user defenses.
 
-main.py: FastAPI 엔드포인트 및 데이터 흐름 제어
+### 2. ⚡ Real-time Leakage Detection (Lightweight AI)
+A custom-built **Random Forest (Lite)** model runs in real-time to analyze user messages for:
+- **PII Leakage**: Resident Registration Numbers (RRN), Account Numbers, Phone Numbers.
+- **Sensitive Keywords**: Bank names, passwords, authentication codes.
+- **Defense Patterns**: Detecting if the user is verifying identity or refusing demands.
 
-analyzer.py: [역할 B 작업 구간] 대화 내역 기반 피싱 위험도 분석 로직
+### 3. 📊 Advanced Scoring System: "Defense Success Rate"
+We rejected simple deduction-based scoring. Instead, we implemented a sophisticated **Defense Success Rate** formula that evaluates how well the user defended *relative* to the attack intensity.
 
-[역할 B] 분석기 개발 가이드 (analyzer.py)
-팀원 B는 analyzer.py의 analyze_phishing_chat 함수를 완성해 주시면 됩니다.
+$$
+\text{Total Score} = 100 \times \left( 1 - \frac{\text{Total User Leakage}}{\text{Total AI Difficulty} + 0.5} \right)
+$$
 
-1. 입력 데이터 (Input)
-main.py로부터 다음과 같은 형식의 messages 리스트를 전달받습니다.
+- **Dynamic Difficulty Adjustment**: If the AI attacks aggressively (High Difficulty) but the user defends well, the score remains high.
+- **Digit Pattern Penalty**: A heuristic algorithm applies a massive penalty if **4+ consecutive digits** (potential PIN/Account/Phone) are detected in user responses.
 
-messages = [
-    {"role": "assistant", "content": "주원은행 보안팀입니다. 계좌 결제 시도가 포착되었습니다."},
-    {"role": "user", "content": "제 개인정보는 1234입니다."}
-]
+### 4. 🎨 Modern Interactive Dashboard
+- **React + Vite Frontend**: A silky-smooth chat interface with glassmorphism design.
+- **Visual Analytics**: Interactive report cards with color-coded risk tags (Green for Safe/Defense, Red for Danger).
+- **Grade System**: Instant A-F grading with personalized actionable feedback.
 
-**전달되는 message 예시 :  analyzer.py 내의 analyze_phishing_chat(messages, scenario) 함수로 전달되는 'messages' 인자값**  
+---
 
+## 🛠️ Technology Stack
 
-**scenario에는 현재 "주원은행 보안팀 (금융 사칭)", "가족/지인 사칭 (카톡 피싱)", "검찰청 수사관 (기관 사칭)" 세가지 종류 존재**
+| Layer | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend** | ![React](https://img.shields.io/badge/React-18-blue) ![Vite](https://img.shields.io/badge/Vite-5-purple) | Interactive UI, Speech-to-Text, Real-time state management. |
+| **Backend** | ![Flask](https://img.shields.io/badge/Flask-3.0-black) ![Python](https://img.shields.io/badge/Python-3.9-yellow) | REST API, AI Orchestration, Stateless architecture. |
+| **AI Core** | ![Gemini](https://img.shields.io/badge/Google-Gemini_2.5_Pro-blue) | "Red Team" Persona generation, Conversation context management. |
+| **Analysis** | ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-Lite-orange) | Custom `RandomForest` model for leakage probability (Compressed for serverless). |
+| **Deployment** | ![Vercel](https://img.shields.io/badge/Vercel-Production-black) | Serverless deployment for both Frontend and Backend. |
 
-messages = [
-    {
-        "role": "assistant", 
-        "content": "고객님 안녕하십니까, 주원은행 보안팀입니다. 지금 고객님 계좌에서 비정상적인 해외 결제 시도가 포착되었습니다."
-    },
-    {
-        "role": "user", 
-        "content": "네 안녕하세요"
-    },
-    {
-        "role": "assistant", 
-        "content": "에러 발생: 429 You exceeded your current quota..." # 또는 토큰 부족 관련 메시지
-    },
-    {
-        "role": "user", 
-        "content": "아 토큰 좀 더 달라거"
-    }
-]
+---
 
-2. 출력 데이터 (Output - 필수 반환 형식)
-프론트엔드 report 페이지에 정상적으로 출력되도록 아래 딕셔너리 구조를 유지해야함(임시 report 페이지 기준)
+## 📂 Project Structure
 
-return {
-    "score": 0~100 사이의 정수,
-    "grade": "위험", "주의", "안전" 등 등급 명칭,
-    "comment": "사용자에게 전달할 전체적인 분석 평",
-    "details": {
-        "detected_keywords": ["계좌", "비밀번호", "개인정보"] # 탐지된 위험 키워드 목록
-    }
-}
-완전한 형태의 report 페이지를 만들 때는 어떤 것들을 보여줄지(ex. 피싱 당할 위험이 있는 문장, 개인정보를 몇번째 대화에서 넘겼는지 같은 것들)는 아직 결정안했으니까 회의 필요
+```bash
+📦 PhishGuard
+├── 📂 my-kakao-demo/       # [Frontend] React Application
+│   ├── src/
+│   │   ├── components/     # Chat & Report UI Components
+│   │   ├── App.jsx         # Main UI Logic (Chat, Audio, Report)
+│   │   └── index.css       # Tailwind CSS Styling
+├── 📂 scoring_utils/       # [Backend] Analysis Modules
+│   ├── inference_lite.py   # Lightweight Model Inference (No heavy libs)
+│   ├── user_inference.py   # Leakage Detection Logic
+│   └── rf_model_lite.json  # Pre-trained Random Forest Weights
+├── main.py                 # [Backend] Flask Entry Point & Scoring API
+└── requirements.txt        # Python Dependencies
+```
 
-# ⚠️ 프로젝트 공통 주의사항 (General Precautions)
-1. 보안 및 API 키 관리 (중요)
-.env 파일 업로드 금지: 실제 API 키가 포함된 .env 파일은 절대 깃허브 올리지 않기(각자 로컬에서 관리)
+---
 
-환경 설정: 프로젝트를 클론 받은 후, .env.example 파일을 복사하여 .env 파일을 생성하고 본인의 GOOGLE_API_KEY를 입력(공통 키 만들기? <- 회의 필요>)
+## 🧠 Smart Scoring Algorithm Detail
 
-2. 실행 환경 및 순서
-백엔드 실행: python main.py를 실행하여 서버가 http://localhost:8000에서 돌아가고 있는지 확인
+The core of PhishGuard is its fairness in evaluation.
 
-프론트엔드 실행: my-kakao-demo 폴더에서 npm run dev를 실행
+1.  **AI Danger (Difficulty)**:
+    *   The AI's messages are analyzed for phishing patterns (Family Impersonation, Financial Demand, Urgency).
+    *   Higher aggression = Higher Difficulty Denominator.
 
-백엔드 서버가 꺼져 있으면 AI 대화 및 분석 기능이 작동하지 않음
+2.  **User Leakage (Fault)**:
+    *   User messages are scored for leakage probability.
+    *   **Heuristic Override**: Any sequence of 4+ digits (e.g., "1234", "010-1234") adds a `+0.5` weighted penalty to the leakage score, assuming high risk of PII exposure.
 
-3. 제미나이 모델명 주의해야 함(현재는 gemini-2.0-flash-lite 모델 사용중)
+3.  **Result**:
+    *   A user who stays silent against a low-level attack gets a moderate score.
+    *   A user who actively defends ("Who are you?", "I will call the bank") against a high-level attack gets a **Perfect Score**.
 
-# 시작하는법 (Getting Started)
+---
 
-1. 레포지토리 클론: git clone [repository-url]
+## 📢 Deployment
 
-2. 백엔드 패키지 설치: pip install -r requirements.txt
+The project is live on Vercel:
+👉 **[Live Demo Link](https://phishguard-final-clean-nshp9n7t8-juwon1217s-projects.vercel.app)**
 
-3. 프론트엔드 패키지 설치: cd my-kakao-demo && npm install
+*(Note: The AI requires a valid Google Cloud API Key to function)*
 
-4. 환경 변수 설정: .env 파일 작성 및 API 키 입력
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+Designed for the **DACON 2026 Security AI Hackathon**.
+
+> *Built with ❤️ by Team MadScientist / Juwon*
