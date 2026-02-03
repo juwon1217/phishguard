@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 // 1. 시나리오 및 프로필 설정 정보
 const SCENARIO_PROFILES = {
+  "가족/지인 사칭 (카톡 피싱)": {
+    name: "지인❤️",
+    avatarText: "지인",
+    avatarColor: "bg-yellow-400 text-slate-900"
+  },
   "농협은행 보안팀 (금융 사칭)": {
     name: "보안팀",
     avatarText: "NH",
     avatarColor: "bg-blue-600 text-white"
-  },
-  "가족/지인 사칭 (카톡 피싱)": {
-    name: "딸❤️",
-    avatarText: "딸",
-    avatarColor: "bg-yellow-400 text-slate-900"
   },
   "검찰청 수사관 (기관 사칭)": {
     name: "김철수 수사관",
