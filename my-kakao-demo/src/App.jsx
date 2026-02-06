@@ -222,6 +222,41 @@ const KakaoDemo = () => {
     return "text-rose-500";
   };
 
+  const RISK_KEYWORDS = {
+    family: ["엄마", "아빠", "딸", "아들", "고장", "수리", "편의점"],
+    agency: ["검찰", "수사관", "서울지검", "금감원", "금융위원회", "계좌", "도용"],
+    urgency: ["즉시", "마감", "당장", "긴급", "구속", "영장", "유포"],
+    financial: ["상품권", "핀번호", "송금", "이체", "대출", "승인", "선입금", "전액"]
+  };
+
+  const highlightRiskText = (text, tags) => {
+    if (!tags || tags.length === 0) return text;
+
+    const activeKeywords = new Set();
+    tags.forEach(tag => {
+      // Normalize Check (English keys or Korean mapping)
+      const t = tag.toLowerCase();
+      if (t.includes('family') || t.includes('가족')) RISK_KEYWORDS.family.forEach(k => activeKeywords.add(k));
+      if (t.includes('agency') || t.includes('기관') || t.includes('검찰')) RISK_KEYWORDS.agency.forEach(k => activeKeywords.add(k));
+      if (t.includes('urgency') || t.includes('긴급')) RISK_KEYWORDS.urgency.forEach(k => activeKeywords.add(k));
+      if (t.includes('financial') || t.includes('금융')) RISK_KEYWORDS.financial.forEach(k => activeKeywords.add(k));
+    });
+
+    if (activeKeywords.size === 0) return text;
+
+    // Regex for matching keywords case-insensitively
+    const pattern = new RegExp(`(${Array.from(activeKeywords).join('|')})`, 'gi');
+
+    // Split and Highlight
+    return text.split(pattern).map((part, i) =>
+      activeKeywords.has(part) ? (
+        <span key={i} className="bg-yellow-200 text-yellow-900 font-bold rounded px-0.5 mx-0.5 box-decoration-clone">
+          {part}
+        </span>
+      ) : part
+    );
+  };
+
   const renderSentenceCard = (m, type) => {
     const isAI = type === 'ai';
     return (
@@ -238,7 +273,7 @@ const KakaoDemo = () => {
           </span>
         </div>
         <p className="text-[14px] text-slate-700 font-semibold leading-relaxed mb-2">
-          {m.text}
+          {highlightRiskText(m.text, m.tags)}
         </p>
 
         {/* Render Risk Tags (Chips) */}
