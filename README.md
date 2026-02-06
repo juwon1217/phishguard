@@ -74,7 +74,7 @@ $$
 
 현재 Vercel을 통해 정식 배포되어 누구나 체험할 수 있습니다.
 
-👉 **[PhishGuard 최종 버전 체험하기](https://phishguard-final-clean-3y3kva2gk-juwon1217s-projects.vercel.app)**
+👉 **[PhishGuard 최종 버전 체험하기](https://phishguard-jw.vercel.app/)**
 *(크롬, 사파리 등 모던 브라우저 환경에 최적화되어 있습니다.)*
 
 ---
