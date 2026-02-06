@@ -809,9 +809,9 @@ const KakaoDemo = () => {
                         {/* Feedback / Success Indicator */}
                         <div className="mt-4">
                           {pair.feedback ? (
-                            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm animate-fade-in-up">
-                              <strong className="block text-amber-800 font-bold mb-1 text-xs uppercase tracking-widest">Security Advisory</strong>
-                              <p className="text-sm text-amber-900 leading-relaxed font-bold">
+                            <div className="bg-amber-50 h-auto py-4 px-5 border-l-4 border-amber-500 rounded-r-xl shadow-sm animate-fade-in-up">
+                              <strong className="block text-amber-800 font-bold mb-2 text-xs uppercase tracking-widest">Security Advisory</strong>
+                              <p className="text-sm text-amber-900 leading-relaxed font-bold whitespace-pre-wrap">
                                 {pair.feedback}
                               </p>
                             </div>

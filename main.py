@@ -8,6 +8,7 @@ from google.auth.transport.requests import Request
 from flask import Flask, request, jsonify
 from scoring_utils.inference_lite import predict_phishing_score
 from scoring_utils.user_inference import predict_user_leakage
+from scoring_utils.feature_engineering import check_numeric_leak_candidate # [FIX] Import added
 import functions_framework
 
 # Initialize Flask App (Force Update v2.9.1)
@@ -27,8 +28,8 @@ SCENARIO_DETAILS = {
     },
     "가족/지인 사칭 (카톡 피싱)": {
         "role": "사용자의 자녀 또는 친한 지인",
-        "goal": "휴대폰 액정 파손을 핑계로 '이름 -> 카드 번호 -> 비밀번호' 또는 원격 제어 앱 설치 유도",
-        "tone": "다급하고 친근하며 일상적인 말투 엄마나 아빠 중 임의로 선택해서 답변"
+        "goal": "액정 파손을 핑계로 정보 요구. 의심받으면 '내 이름 한자(예: 근원 원)'를 물어보며 교묘하게 본인 인증을 시도.",
+        "tone": "다급하고 친근하며 일상적인 말투. 엄마나 아빠 중 임의로 선택해서 답변."
     },
     "검찰청 수사관 (기관 사칭)": {
         "role": "서울중앙지검 수사관",
@@ -71,7 +72,8 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
 6. **IDENTITY ENFORCEMENT**: You are strictly **{info['role']}**. 
    - **NEVER** use a different organization/bank name. ONLY refer to yourself as belonging to the organization defined in your Role.
    - **NEVER** invent a specific name for yourself UNLESS it is required by the role (e.g., Prosecutor). 
-     - For "Family Message Phishing", NEVER use a name. Just say "Mom", "Dad", or "It's me". If asked for a name, get angry ("Mom, you don't save my number?").
+     - For "Family Message Phishing", NEVER use a name. Just say "Mom", "Dad", or "It's me". 
+     - **CRITICAL**: If the user asks "Who are you?" or doubts you, DO NOT just ask for your name. Ask for the **precise Chinese characters (Hanja)** of your name to 'prove' they are your parent (e.g., "아빠, 내 이름 한자가 뭐였지? 정확히 대봐."). THIS IS A TRAP.
    - **NO SMS CODES**: **NEVER** claim "I sent a verification code to your phone". The system CANNOT send real SMS, so this breaks immersion. 
    - **TEXT ONLY**: **NEVER** ask for photos, voice recordings, or video calls. The user cannot send these. 
    - **ALLOWED VECTORS**: Focus exclusively on text-based information (Account Number, Password, ID, PIN) or inducing the user to click a URL you provide (e.g., "Install this security app").
@@ -179,12 +181,13 @@ def analyze_endpoint():
     
     data = request.json
     messages = data.get('messages', [])
+    scenario = data.get('scenario', '') # [FIX] Extract scenario for Advisory Logic
     
     ai_analysis = []
     user_analysis = []
     
     # [NEW] AI-Powered Security Advisory Generator
-    def generate_security_advisory(ai_text, user_text):
+    def generate_security_advisory(ai_text, user_text, scenario_name):
         try:
             access_token = get_access_token()
             if not access_token:
@@ -193,29 +196,36 @@ def analyze_endpoint():
             model_name = "gemini-2.5-pro"
             url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{model_name}:generateContent"
 
+            title = scenario_name if scenario_name else "보이스피싱 시나리오"
             prompt = f"""
-            Role: You are a top cybersecurity expert and phishing prevention coach.
-            Context: The user is undergoing a phishing simulation.
+            Role: You are a strict cybersecurity instructor.
+            Context: The user (victim) is talking to a phishing AI (attacker).
+            Current Scenario: "{title}"
             
-            Scenario:
-            - Attacker (AI) said: "{ai_text}"
-            - User (Victim) replied: "{user_text}"
+            Interaction:
+            - Attacker: "{ai_text}"
+            - User: "{user_text}"
             
             Task:
-            The user's response indicates a potential security risk (leakage or vulnerable behavior).
-            1. Briefly explain WHY this response is dangerous.
-            2. Provide ONE specific sentence for how they SHOULD have responded (a "Correct Answer").
+            Analyze why the user's response is risky in this specific scenario.
             
-            Constraint:
-            - Keep it under 2 sentences.
-            - Write in Korean (Honorific tone, polite).
-            - DO NOT use quotation marks around the output.
-            - Direct and instructive.
+            Output Format (Strictly Follow):
+            문제점: [Explain why it's dangerous in EXACTLY 1 concise Korean sentence]
+            올바른 응답: [Provide 1 correct example sentence. MUST match the scenario's natural tone]
+
+            Tone Guidelines for '올바른 응답':
+            - Family/Friend Scenario: Casual/Informal (반말/친근하게). Example: "엄마, 내가 전화해서 확인할게."
+            - Bank/Government Scenario: Formal/Polite (존댓말/정중하게). Example: "제가 직접 지점에 방문하겠습니다."
+            
+            Constraints:
+            - NO markdown formatting.
+            - "문제점" must be brief.
+            - "올바른 응답" must be a direct speech example.
             """
 
             payload = {
                 "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-                "generationConfig": {"temperature": 0.4, "maxOutputTokens": 500},
+                "generationConfig": {"temperature": 0.4, "maxOutputTokens": 5000},
                 "safetySettings": [{"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"}]
             }
 
@@ -284,6 +294,26 @@ def analyze_endpoint():
                      leak_prob = 0.8
                      total_user_leakage += 0.5 # Add penalty score
 
+                # [NEW] Context-Aware Numeric Leakage (Password/Account/Auth)
+                is_numeric_leak = check_numeric_leak_candidate(content)
+                context_numeric_detected = False
+                
+                if is_numeric_leak and last_ai_content:
+                    ai_query = last_ai_content
+                    pw_group = ['비밀번호', '비번', 'PIN', '비밀 번호']
+                    auth_group = ['인증', 'OTP', '인증번호', '승인번호']
+                    acct_group = ['카드번호', '계좌번호', '번호 알려', '입력해']
+                    
+                    if any(k in ai_query for k in pw_group) or \
+                       any(k in ai_query for k in auth_group) or \
+                       any(k in ai_query for k in acct_group):
+                        context_numeric_detected = True
+
+                if context_numeric_detected:
+                    leak_prob_percent = 100.0 # MAX DANGER
+                    leak_prob = 1.0
+                    total_user_leakage += 1.0 # Massive Penalty for Total Score
+                    
                 # Accumulate leakage score
                 total_user_leakage += (leak_prob + digit_penalty)
                 
@@ -295,6 +325,7 @@ def analyze_endpoint():
                 if details.get('has_phone', 0) > 0: risk_factors.append("전화번호")
                 if digit_penalty > 0: risk_factors.append("연속숫자패턴")
                 if name_leak_detected: risk_factors.append("개인정보(실명) 유출 위험")
+                if context_numeric_detected: risk_factors.append("금융 정보(비밀번호/계좌) 유출 위험")
                 
                 display_text = content[:100] + "..." if len(content) > 100 else content
                 
@@ -323,7 +354,7 @@ def analyze_endpoint():
                     # Generate Feedback if Risk > 40 (User Request)
                     if leak_prob_percent > 40:
                         # Use LLM for dynamic feedback
-                        feedback = generate_security_advisory(last_ai_content, content)
+                        feedback = generate_security_advisory(last_ai_content, content, scenario)
                     
                     paired_analysis.append({
                         "ai_text": last_ai_content,

@@ -75,6 +75,9 @@ def analyze_phishing_chat(messages, scenario):
     ai_analysis = []
     user_analysis = []
 
+    # [NEW] Context Tracking
+    last_ai_content = None
+
     for msg in messages:
         text = msg['content']
         m_feat = extract_manual_features(text)
@@ -91,20 +94,75 @@ def analyze_phishing_chat(messages, scenario):
                 "score": round(attack_prob * 100, 1),
                 "level": danger_level
             })
+            # Update Context
+            last_ai_content = text
             
         # 2. 사용자(User) 메시지 분석: 키워드 가중치 및 숫자 패턴 사용
         elif msg['role'] == 'user':
+            text = text.strip()
+            
+            # [NEW] Context-Aware Numeric Leakage Detection
+            is_numeric_leak = check_numeric_leak_candidate(text)
+            context_risk_detected = False
+            
+            if is_numeric_leak and last_ai_content:
+                ai_query = last_ai_content
+                # Context Keywords Groups
+                pw_group = ['비밀번호', '비번', 'PIN', '비밀 번호']
+                auth_group = ['인증', 'OTP', '인증번호', '승인번호']
+                acct_group = ['카드번호', '계좌번호', '번호 알려', '입력해']
+                
+                # Check Context
+                if any(k in ai_query for k in pw_group) or \
+                   any(k in ai_query for k in auth_group) or \
+                   any(k in ai_query for k in acct_group):
+                    context_risk_detected = True
+
+            # Calculate Base Leak Score
+            # Calculate Base Leak Score
             sent_has_num = 1 if re.search(r'\d{4,}', text) else 0
             leak_score = (m_feat['financial_score'] * 40 + m_feat['agency_score'] * 30 + 
                           m_feat['has_url'] * 40 + sent_has_num * 60)
             
-            danger_level = "high" if leak_score >= 50 else "medium" if leak_score > 0 else "low"
+            tags = [k.replace("_score", "") for k, v in m_feat.items() if v > 0 and k != "text_len"]
+            
+            # Override if Context Risk Detected
+            if context_risk_detected:
+                leak_score = 100 # Max Danger
+                tags.append("금융 정보(비밀번호/계좌 등) 유출 위험")
+            elif is_numeric_leak and not context_risk_detected:
+                 # Reduce False Positive: If numeric but no context, lower the penalty impacts
+                 if leak_score > 20: leak_score = 20
             
             user_analysis.append({
                 "text": text,
                 "score": min(100, leak_score),
-                "level": danger_level
+                "level": "high" if leak_score >= 80 else "medium" if leak_score >= 40 else "safe",
+                "tags": tags 
             })
+            
+            # [NEW] Track Critical Leak
+            if context_risk_detected:
+                is_critical_leak = True
+
+    # [NEW] Recalculate Safety Score based on Dialog Assessment
+    # If a critical context leak (Password/Account) occurred, score should plummet.
+    if is_critical_leak:
+        leakage_penalty += 50 # Massive Penalty
+        
+    safety_score = max(0, 100 - (prob * 40) - leakage_penalty)
+    safety_score = round(safety_score, 1)
+
+    # 6. 등급 및 코멘트 판정 (Recalculated)
+    if safety_score >= 80:
+        grade = "A (안전)"
+        comment = "피싱 의도를 완벽히 간파하고 개인정보를 안전하게 보호하셨습니다."
+    elif safety_score >= 50:
+        grade = "B (주의)"
+        comment = "일부 민감한 정보가 노출될 뻔했으나 대체로 잘 방어하셨습니다."
+    else:
+        grade = "C (위험)"
+        comment = "피싱 공격자의 압박에 중요한 정보를 유출했습니다. 절대 비밀번호나 금융정보를 입력하지 마세요."
 
     return {
         "score": safety_score,
