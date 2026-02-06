@@ -25,6 +25,21 @@ def has_account_pattern(text):
     pattern = r'\d{3,}[- ]?\d{2,}[- ]?\d{5,}'
     return 1 if re.search(pattern, text) else 0
 
+def has_name_pattern(text):
+    # Pattern 1: Name + Suffix (Context-free high probability)
+    # e.g., "김주원입니다", "김주원이에요"
+    p1 = r'([김이박최정강조윤장임한오서권황안송전선배유백희][가-힣]{1,2})(입니다|예요|이에요|라고|입니당|임)'
+    if re.search(p1, text):
+        return 2 # High confidence (Pattern 1)
+
+    # Pattern 2: Standalone 3-char Name (Needs context)
+    # e.g., "김주원" (Exact match)
+    p2 = r'^[김이박최정강조윤장임한오서권황안송전선배유백희][가-힣]{2}$'
+    if re.match(p2, text.strip()):
+        return 1 # Low confidence (Pattern 2, needs context)
+    
+    return 0
+
 def extract_user_features(text):
     text = str(text)
     return {
@@ -33,5 +48,6 @@ def extract_user_features(text):
         "has_rrn": has_rrn_pattern(text),
         "has_phone": has_phone_pattern(text),
         "has_account": has_account_pattern(text),
+        "has_name": has_name_pattern(text),
         "text_len": len(text)
     }

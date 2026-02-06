@@ -187,8 +187,11 @@ const KakaoDemo = () => {
       return;
     }
 
+    // [UX] 분석형 로딩 화면 진입
+    setView('analyzing');
+
     try {
-      setIsLoading(true);
+      // setIsLoading(true)는 필요 없거나 백그라운드 처리를 위해 유지
       const response = await fetch(`${apiBaseUrl}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -199,12 +202,12 @@ const KakaoDemo = () => {
       });
       const result = await response.json();
       setAnalysisResult(result.report || result);
+
+      // 분석 완료 후 리포트 화면으로 전환
       setView('report');
     } catch (error) {
       console.error("분석 요청 실패:", error);
       setView('report');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -647,6 +650,39 @@ const KakaoDemo = () => {
     </div>
   );
 
+  // [NEW] Analyzing Loading Screen
+  const renderAnalyzing = () => (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Background Ambience */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-100/50 rounded-full blur-[100px] animate-pulse"></div>
+
+      <div className="relative z-10 bg-white p-10 md:p-14 rounded-[3rem] shadow-2xl flex flex-col items-center text-center max-w-md w-full border border-slate-100/50 backdrop-blur-xl">
+
+        {/* Animated Icon */}
+        <div className="relative mb-10">
+          <div className="absolute inset-0 bg-blue-400 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+          <div className="w-24 h-24 rounded-full bg-slate-50 border-4 border-slate-100 flex items-center justify-center relative z-10 shadow-inner">
+            <span className="text-5xl animate-bounce delay-75">🛡️</span>
+            {/* Spinning Ring */}
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin"></div>
+          </div>
+        </div>
+
+        <h2 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">보안 진단 중...</h2>
+        <p className="text-slate-500 font-medium mb-10 text-sm leading-relaxed">
+          AI가 대화의 맥락을 정밀 분석하고 있습니다.<br />
+          잠시만 기다려주세요.
+        </p>
+
+        {/* Progress Bar */}
+        <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden relative">
+          <div className="absolute top-0 left-0 h-full bg-blue-600 rounded-full w-full animate-indeterminate-progress origin-left"></div>
+        </div>
+
+      </div>
+    </div>
+  );
+
   const renderReport = () => {
     if (!analysisResult) return <div className="p-10 text-center">분석 중 오류가 발생했습니다.</div>;
 
@@ -674,84 +710,141 @@ const KakaoDemo = () => {
       );
     }
 
-    const data = analysisResult || { score: 0, comment: "분석 결과가 없습니다.", ai_analysis: [], user_analysis: [], grade: "F" };
+    const data = analysisResult || { score: 0, comment: "분석 결과가 없습니다.", ai_analysis: [], user_analysis: [], paired_analysis: [], grade: "F" };
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-[#f1f5f9] p-4 md:p-8 font-sans">
-        {/* 가로형 모던 대시보드 레이아웃 */}
-        <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-300/30 max-w-6xl w-full overflow-hidden border border-slate-200 flex flex-col md:h-[88vh]">
+      <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 pb-20">
 
-          {/* Header Section: 요약 정보 및 최종 점수 */}
-          <div className="flex flex-col md:flex-row bg-white">
-            <div className="flex-1 p-8 md:p-10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">시뮬레이션 진단 결과</h2>
+        {/* Top Navigation / Header */}
+        <div className="bg-white border-b border-slate-200 sticky top-0 z-20 px-6 py-4 shadow-sm">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
-
-              {/* 메인 코멘트 */}
-              <div className="mt-6 p-6 rounded-2xl bg-slate-50 border border-slate-100">
-                <p className="text-lg font-bold text-slate-800 leading-relaxed">
-                  {data.comment}
-                </p>
-              </div>
+              <h1 className="text-xl font-black tracking-tight text-slate-800">PhishGuard <span className="text-slate-400 font-medium text-sm">Report</span></h1>
             </div>
+            <button onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }} className="text-xs font-bold text-slate-500 hover:text-slate-800 uppercase tracking-widest">
+              Exit Analysis
+            </button>
+          </div>
+        </div>
 
-            <div className="w-full md:w-[320px] bg-slate-50/50 p-8 flex flex-col items-center justify-center border-l border-slate-100">
-              <div className={`text-7xl font-black mb-2 ${getScoreColor(data.score)}`}>
-                {data.score}<span className="text-2xl text-slate-300 ml-1">/100</span>
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-10 space-y-8">
+
+          {/* 1. Score Summary Card (Full Width) */}
+          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center gap-10">
+            <div className="flex-1">
+              <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">시뮬레이션 진단 결과</h2>
+              <p className="text-xl text-slate-600 leading-relaxed font-medium">
+                {data.comment}
+              </p>
+            </div>
+            <div className="flex flex-col items-center justify-center pl-0 md:pl-10 md:border-l border-slate-100 min-w-[200px]">
+              <div className={`text-8xl font-black ${getScoreColor(data.score)} tracking-tighter mb-2`}>
+                {data.score}
               </div>
-              <div className="text-[12px] font-bold text-slate-500 uppercase tracking-widest bg-white px-5 py-2 rounded-full shadow-sm border border-slate-100">
-                등급: <span className={getScoreColor(data.score)}>{data.grade}</span>
+              <div className={`text-sm font-bold px-4 py-1.5 rounded-full border ${getScoreColor(data.score).replace('text-', 'bg-').replace('600', '50').replace('500', '50')} ${getScoreColor(data.score).replace('text-', 'border-').replace('600', '200').replace('500', '200')}`}>
+                보안 등급 <span className="ml-1">{data.grade}</span>
               </div>
             </div>
           </div>
 
-          {/* Analysis Section: 2열 가로 그리드 */}
-          <div className="flex-1 flex flex-col md:flex-row overflow-hidden border-t border-slate-100">
+          {/* 2. Analysis Grid (Natural Height) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-            {/* 좌측: AI 공격 데이터 분석 */}
-            <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto border-r border-slate-100 bg-[#fcfdfe] custom-scrollbar">
-              <div className="flex items-center gap-2 mb-6">
+            {/* Left: AI Attack Analysis */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 h-full">
+              <div className="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100">
                 <span className="w-1.5 h-6 bg-indigo-500 rounded-full"></span>
-                <h3 className="text-base font-black text-slate-800">피싱 공격 패턴 분석</h3>
+                <h3 className="text-lg font-black text-slate-800">피싱 공격 패턴 분석</h3>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {data.ai_analysis.map((m) => renderSentenceCard(m, 'ai'))}
               </div>
             </div>
 
-            {/* 우측: 나의 대응 데이터 분석 */}
-            <div className="flex-1 flex flex-col p-6 md:p-8 overflow-y-auto bg-white custom-scrollbar">
-              <div className="flex items-center gap-2 mb-6">
+            {/* Right: User Leakage Analysis */}
+            <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-200 h-full">
+              <div className="flex items-center gap-3 mb-8 pb-4 border-b border-slate-100">
                 <span className="w-1.5 h-6 bg-rose-500 rounded-full"></span>
-                <h3 className="text-base font-black text-slate-800">개인정보 노출 여부 분석</h3>
+                <h3 className="text-lg font-black text-slate-800">개인정보 노출 여부 분석</h3>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {data.user_analysis.map((m) => renderSentenceCard(m, 'user'))}
               </div>
             </div>
           </div>
 
-          {/* Footer Section */}
-          <div className="p-6 md:p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-6">
-              <div className="text-xs font-bold text-slate-400">
-                SCENARIO: <span className="text-slate-900 ml-1">{selectedScenario.split(' ')[0].replace('농협은행', '은행')}</span>
+          {/* 3. Detailed Action Correction Guide (Full Width) */}
+          {data.paired_analysis && data.paired_analysis.length > 0 && (
+            <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-200">
+              <div className="flex items-center gap-3 mb-10">
+                <span className="w-1.5 h-6 bg-amber-500 rounded-full"></span>
+                <h3 className="text-xl font-black text-slate-800">상세 행동 교정 가이드</h3>
               </div>
-              <div className="text-xs font-bold text-slate-400">
-                ENGINE: <span className="text-emerald-600 ml-1 font-black">PhishGuard v2.8</span>
+
+              <div className="space-y-8">
+                {data.paired_analysis.map((pair, idx) => (
+                  <div key={idx} className="relative pl-6 md:pl-0">
+                    {/* Timeline Line (Desktop only) */}
+                    <div className="hidden md:block absolute left-[50%] top-0 bottom-0 w-px bg-slate-100 -translate-x-1/2"></div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 relative">
+                      {/* AI Side */}
+                      <div className="relative">
+                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl rounded-tl-sm text-slate-600 text-sm leading-relaxed shadow-sm">
+                          <span className="text-[10px] font-bold text-slate-400 block mb-2 uppercase tracking-wide">AI Attack</span>
+                          {pair.ai_text}
+                        </div>
+                      </div>
+
+                      {/* User Side */}
+                      <div className="relative">
+                        <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-2xl rounded-tr-sm text-blue-900 text-sm leading-relaxed shadow-sm text-right">
+                          <span className="text-[10px] font-bold text-blue-400 block mb-2 uppercase tracking-wide">My Response</span>
+                          {pair.user_text}
+                        </div>
+
+                        {/* Feedback / Success Indicator */}
+                        <div className="mt-4">
+                          {pair.feedback ? (
+                            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm animate-fade-in-up">
+                              <strong className="block text-amber-800 font-bold mb-1 text-xs uppercase tracking-widest">Security Advisory</strong>
+                              <p className="text-sm text-amber-900 leading-relaxed font-bold">
+                                {pair.feedback}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="flex justify-end">
+                              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100">
+                                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                적절한 대응 확인됨
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+          )}
+
+          {/* Footer Info */}
+          <div className="text-center pt-10 text-slate-400 text-xs">
+            <p>SCENARIO: <span className="font-bold text-slate-600">{selectedScenario.split(' ')[0].replace('농협은행', '은행')}</span></p>
+            <p className="mt-1">ENGINE: PhishGuard v2.8</p>
+
             <button
               onClick={() => { setView('intro'); setMessages([]); setAnalysisResult(null); }}
-              className="px-12 py-4 bg-slate-900 text-white text-sm font-black rounded-2xl hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-200"
+              className="mt-8 px-8 py-3 bg-slate-900 text-white font-bold rounded-full hover:bg-black transition-all shadow-lg shadow-slate-200"
             >
               다시 도전하기
             </button>
           </div>
+
         </div>
       </div>
     );
@@ -761,6 +854,7 @@ const KakaoDemo = () => {
     <>
       {view === 'intro' && renderIntro()}
       {view === 'chat' && renderChat()}
+      {view === 'analyzing' && renderAnalyzing()}
       {view === 'report' && renderReport()}
     </>
   );

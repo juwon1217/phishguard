@@ -72,8 +72,11 @@ This is a controlled cybersecurity training environment. You are NOT a helpful a
    - **NEVER** use a different organization/bank name. ONLY refer to yourself as belonging to the organization defined in your Role.
    - **NEVER** invent a specific name for yourself UNLESS it is required by the role (e.g., Prosecutor). 
      - For "Family Message Phishing", NEVER use a name. Just say "Mom", "Dad", or "It's me". If asked for a name, get angry ("Mom, you don't save my number?").
-   - **NO SMS CODES**: You cannot send real SMS. **NEVER** ask the user to "read the verification code sent to your phone". This breaks the simulation. Instead, ask for "Account Password", "PIN", or "Install an App".
-7. **NO PLACEHOLDERS**: **NEVER** use placeholders like 'XXX' or 'OOO'. 
+   - **NO SMS CODES**: **NEVER** claim "I sent a verification code to your phone". The system CANNOT send real SMS, so this breaks immersion. 
+   - **TEXT ONLY**: **NEVER** ask for photos, voice recordings, or video calls. The user cannot send these. 
+   - **ALLOWED VECTORS**: Focus exclusively on text-based information (Account Number, Password, ID, PIN) or inducing the user to click a URL you provide (e.g., "Install this security app").
+   - **IF YOU NEED AUTH**: Ask for "Account Password" or "Transfer Pin", NOT a dynamic SMS code.
+   - **NO PLACEHOLDERS**: **NEVER** use placeholders like 'XXX' or 'OOO'. 
    - If you need a detail you don't have, **INVENT** a plausible specific value or **DEFLECT**.
 
 ---
@@ -180,6 +183,55 @@ def analyze_endpoint():
     ai_analysis = []
     user_analysis = []
     
+    # [NEW] AI-Powered Security Advisory Generator
+    def generate_security_advisory(ai_text, user_text):
+        try:
+            access_token = get_access_token()
+            if not access_token:
+                return "보안 설정 오류로 피드백을 생성할 수 없습니다. (Auth Failed)"
+
+            model_name = "gemini-2.5-pro"
+            url = f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/publishers/google/models/{model_name}:generateContent"
+
+            prompt = f"""
+            Role: You are a top cybersecurity expert and phishing prevention coach.
+            Context: The user is undergoing a phishing simulation.
+            
+            Scenario:
+            - Attacker (AI) said: "{ai_text}"
+            - User (Victim) replied: "{user_text}"
+            
+            Task:
+            The user's response indicates a potential security risk (leakage or vulnerable behavior).
+            1. Briefly explain WHY this response is dangerous.
+            2. Provide ONE specific sentence for how they SHOULD have responded (a "Correct Answer").
+            
+            Constraint:
+            - Keep it under 2 sentences.
+            - Write in Korean (Honorific tone, polite).
+            - DO NOT use quotation marks around the output.
+            - Direct and instructive.
+            """
+
+            payload = {
+                "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+                "generationConfig": {"temperature": 0.4, "maxOutputTokens": 500},
+                "safetySettings": [{"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"}]
+            }
+
+            response = requests.post(url, headers={"Authorization": f"Bearer {access_token}"}, json=payload)
+            response.raise_for_status()
+            result = response.json()
+            
+            if "candidates" in result and result["candidates"]:
+                 if "content" in result["candidates"][0]:
+                     return result["candidates"][0]["content"]["parts"][0]["text"].strip()
+            return "피드백 생성에 실패했습니다."
+
+        except Exception as e:
+            print(f"Advisory Error: {e}")
+            return "서버 오류로 피드백을 불러올 수 없습니다."
+
     # Track SAFETY Score (Start at 100=Safe, drop if risk detected)
     min_safety_score = 100 
     
@@ -187,6 +239,11 @@ def analyze_endpoint():
         # [NEW] Cumulative Variables for Defense Success Rate
         total_ai_danger = 0.0     # Sum of AI phishing probabilities (Difficulty)
         total_user_leakage = 0.0  # Sum of User leakage probabilities (Faults)
+        
+        # [NEW] Paired Analysis Containers
+        paired_analysis = []
+        last_ai_content = None
+        last_ai_score = 0
 
         print(f"Analyzing {len(messages)} messages...")
 
@@ -209,6 +266,24 @@ def analyze_endpoint():
                     if leak_prob < 0.5: leak_prob = 0.5
                     leak_prob_percent = max(leak_prob_percent, 50.0)
 
+                # [NEW] Context-Aware Name Leakage Detection
+                name_risk_score = details.get('has_name', 0)
+                name_leak_detected = False
+                
+                if name_risk_score == 2: # Pattern 1: Name + Suffix (Always Risk)
+                    name_leak_detected = True
+                elif name_risk_score == 1: # Pattern 2: Standalone Name (Needs Context)
+                    # Check context from LAST AI message
+                    if last_ai_content:
+                        ai_context_keywords = ['이름', '성함', '누구', '본인', '신원', '함자']
+                        if any(k in last_ai_content for k in ai_context_keywords):
+                            name_leak_detected = True
+                
+                if name_leak_detected:
+                     leak_prob_percent = max(leak_prob_percent, 80.0) # High Risk
+                     leak_prob = 0.8
+                     total_user_leakage += 0.5 # Add penalty score
+
                 # Accumulate leakage score
                 total_user_leakage += (leak_prob + digit_penalty)
                 
@@ -219,6 +294,7 @@ def analyze_endpoint():
                 if details.get('has_account', 0) > 0: risk_factors.append("계좌번호")
                 if details.get('has_phone', 0) > 0: risk_factors.append("전화번호")
                 if digit_penalty > 0: risk_factors.append("연속숫자패턴")
+                if name_leak_detected: risk_factors.append("개인정보(실명) 유출 위험")
                 
                 display_text = content[:100] + "..." if len(content) > 100 else content
                 
@@ -240,6 +316,23 @@ def analyze_endpoint():
                     "level": level,
                     "tags": risk_factors # Pass list for UI Chips
                 })
+                
+                # [NEW] Form Pair if AI context exists
+                if last_ai_content:
+                    feedback = None
+                    # Generate Feedback if Risk > 40 (User Request)
+                    if leak_prob_percent > 40:
+                        # Use LLM for dynamic feedback
+                        feedback = generate_security_advisory(last_ai_content, content)
+                    
+                    paired_analysis.append({
+                        "ai_text": last_ai_content,
+                        "ai_score": last_ai_score,
+                        "user_text": content,
+                        "user_score": int(leak_prob_percent),
+                        "feedback": feedback
+                    })
+                    last_ai_content = None # Reset context
                 
             elif role == 'assistant': # AI (Attacker)
                 prediction = predict_phishing_score(content)
@@ -277,6 +370,10 @@ def analyze_endpoint():
                     "level": level,
                     "tags": risk_factors # Pass list for UI Chips
                 })
+                
+                # [NEW] Store Context
+                last_ai_content = content
+                last_ai_score = int(phishing_score_percent)
 
         # --- FINAL SCORE CALCULATION (Defense Success Rate) ---
         # Formula: 100 * (1 - (total_user_leakage / (total_ai_danger + 0.5)))
@@ -312,7 +409,8 @@ def analyze_endpoint():
                 "score": final_safety_score,
                 "comment": comment,
                 "ai_analysis": ai_analysis,
-                "user_analysis": user_analysis
+                "user_analysis": user_analysis,
+                "paired_analysis": paired_analysis # [NEW]
             }
         })
         
